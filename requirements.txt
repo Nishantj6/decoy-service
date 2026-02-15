@@ -1,0 +1,6 @@
+# Decoy Service Dependencies
+# Install with: pip3 install -r requirements.txt
+
+# Core dependencies
+selenium>=4.0.0
+pyyaml>=6.0
