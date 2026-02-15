@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <!-- Shield with lock -->
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4CAF50;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2E7D32;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Shield background -->
+  <path d="M8 1 L3 4 L3 8 C3 12 8 14.5 8 14.5 C8 14.5 13 12 13 8 L13 4 Z" fill="url(#grad)" stroke="#1B5E20" stroke-width="0.5"/>
+  <!-- Lock symbol -->
+  <rect x="6.5" y="8" width="3" height="3" rx="0.3" fill="#FFFFFF" opacity="0.9"/>
+  <circle cx="7.5" cy="7.5" r="1.2" fill="none" stroke="#FFFFFF" stroke-width="0.4" opacity="0.9"/>
+</svg>

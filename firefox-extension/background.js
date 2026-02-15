@@ -5,39 +5,36 @@ let serviceRunning = false;
 // Handle messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'startService') {
-        if (!serviceRunning) {
-            startDecoyService();
-            serviceRunning = true;
-            sendResponse({ success: true });
-        } else {
-            sendResponse({ success: false, error: 'Service already running' });
-        }
+        startDecoyService().then(success => {
+            if (success) {
+                serviceRunning = true;
+                sendResponse({ success: true });
+            } else {
+                sendResponse({ success: false, error: 'Failed to start service' });
+            }
+        });
+        return true; // Keep message channel open for async response
     } else if (request.action === 'stopService') {
-        if (serviceRunning) {
-            stopDecoyService();
-            serviceRunning = false;
-            sendResponse({ success: true });
-        } else {
-            sendResponse({ success: false, error: 'Service not running' });
-        }
+        stopDecoyService().then(success => {
+            if (success) {
+                serviceRunning = false;
+                sendResponse({ success: true });
+            } else {
+                sendResponse({ success: false, error: 'Failed to stop service' });
+            }
+        });
+        return true; // Keep message channel open for async response
     } else if (request.action === 'getStatus') {
-        sendResponse({ running: serviceRunning });
+        getServiceStatus().then(status => {
+            sendResponse({ running: status.running, stats: status.stats });
+        });
+        return true; // Keep message channel open for async response
     }
 });
 
 function startDecoyService() {
-    // Send message to content script or native messaging
-    console.log('🟢 Decoy Service started');
-    
-    // You would typically:
-    // 1. Use native messaging to communicate with Python service
-    // 2. Or spawn a child process
-    // 3. Or trigger the service via HTTP request
-    
-    // For now, we'll use a simple HTTP request approach
-    // This would require the Python service to expose a REST API
-    
-    fetch('http://localhost:9999/api/start', {
+    console.log('🟢 Decoy Service starting...');
+    return fetch('http://localhost:9999/api/start', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -46,16 +43,17 @@ function startDecoyService() {
     .then(response => response.json())
     .then(data => {
         console.log('Service started:', data);
+        return data.success === true;
     })
     .catch(error => {
         console.error('Error starting service:', error);
+        return false;
     });
 }
 
 function stopDecoyService() {
-    console.log('🔴 Decoy Service stopped');
-    
-    fetch('http://localhost:9999/api/stop', {
+    console.log('🔴 Decoy Service stopping...');
+    return fetch('http://localhost:9999/api/stop', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -64,28 +62,41 @@ function stopDecoyService() {
     .then(response => response.json())
     .then(data => {
         console.log('Service stopped:', data);
+        return data.success === true;
     })
     .catch(error => {
         console.error('Error stopping service:', error);
+        return false;
     });
 }
 
-// Simulate activity updates (in real implementation, 
-// this would come from the Python service)
-setInterval(() => {
-    if (serviceRunning) {
-        const stats = {
-            sitesVisited: Math.floor(Math.random() * 10),
-            clicksMade: Math.floor(Math.random() * 50),
-            searchesPerformed: Math.floor(Math.random() * 5)
+function getServiceStatus() {
+    return fetch('http://localhost:9999/api/status')
+    .then(response => response.json())
+    .then(data => {
+        return {
+            running: data.running || false,
+            stats: data.stats || {}
         };
+    })
+    .catch(error => {
+        console.error('Error getting status:', error);
+        return { running: false, stats: {} };
+    });
+}
 
-        // Send update to all popup instances
+// Periodically sync status with API
+setInterval(() => {
+    getServiceStatus().then(status => {
+        serviceRunning = status.running;
+        
+        // Send status to all popup instances
         chrome.runtime.sendMessage({
-            action: 'updateStats',
-            stats: stats
+            action: 'statusUpdate',
+            running: status.running,
+            stats: status.stats
         }).catch(() => {
             // Popup not open, ignore error
         });
-    }
-}, 5000);
+    });
+}, 2000);
