@@ -3,7 +3,16 @@
   "name": "Decoy Service",
   "version": "1.0.0",
   "description": "Privacy protection through behavioral obfuscation. Enable/disable decoy browsing activity to confuse advertisers.",
-  
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "decoy-service@nishantj6.github.io",
+      "data_collection_permissions": {
+        "required": false
+      }
+    }
+  },
+
   "permissions": [
     "storage",
     "activeTab",

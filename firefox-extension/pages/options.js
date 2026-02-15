@@ -112,15 +112,34 @@ function loadActivityLog() {
                 data.activities.reverse().forEach(activity => {
                     const item = document.createElement('div');
                     item.className = 'activity-item';
-                    item.innerHTML = `
-                        <div class="timestamp">${activity.timestamp}</div>
-                        <span class="type ${activity.type}">${activity.type.toUpperCase()}</span>
-                        <div class="detail">${escapeHtml(activity.detail)}</div>
-                    `;
+
+                    // Create timestamp element
+                    const timestamp = document.createElement('div');
+                    timestamp.className = 'timestamp';
+                    timestamp.textContent = activity.timestamp;
+
+                    // Create type badge
+                    const typeBadge = document.createElement('span');
+                    typeBadge.className = `type ${activity.type}`;
+                    typeBadge.textContent = activity.type.toUpperCase();
+
+                    // Create detail element
+                    const detail = document.createElement('div');
+                    detail.className = 'detail';
+                    detail.textContent = activity.detail;
+
+                    // Append all elements
+                    item.appendChild(timestamp);
+                    item.appendChild(typeBadge);
+                    item.appendChild(detail);
                     logDiv.appendChild(item);
                 });
             } else {
-                logDiv.innerHTML = '<p class="loading">No activity yet</p>';
+                logDiv.textContent = '';
+                const noActivity = document.createElement('p');
+                noActivity.className = 'loading';
+                noActivity.textContent = 'No activity yet';
+                logDiv.appendChild(noActivity);
             }
         })
         .catch(error => {
