@@ -6,7 +6,8 @@
 
   "browser_specific_settings": {
     "gecko": {
-      "id": "decoy-service@nishantj6.github.io"
+      "id": "decoy-service@nishantj6.github.io",
+      "strict_min_version": "109.0"
     }
   },
 
