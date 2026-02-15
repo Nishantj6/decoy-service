@@ -1,21 +1,287 @@
 #!/usr/bin/env python3
 """
-Legacy daemon entrypoint.
-Starts the same localhost API server used by the Firefox extension.
+Decoy Service Daemon - Unix Socket-based IPC Server
+Provides background service without Flask HTTP overhead
+Enables auto-start via LaunchAgent (macOS) / systemd (Linux)
 """
 
-from api_server import app, API_PORT, logger
+import socket
+import json
+import os
+import signal
+import sys
+import logging
+import threading
+from pathlib import Path
+from typing import Dict, Any
+
+# Setup logging
+log_dir = Path.home() / '.decoy-service'
+log_dir.mkdir(exist_ok=True, mode=0o700)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(log_dir / 'daemon.log'),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger('DecoyDaemon')
+
+SOCKET_PATH = log_dir / 'daemon.sock'
+
+
+class DecoyDaemon:
+    def __init__(self):
+        self.running = True
+        self.service_active = False
+        self.socket = None
+        self.client_threads = []
+        
+        # Import service here to avoid early dependencies
+        try:
+            # Import from the decoy_service module directly
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            from decoy_service.decoy_service import DecoyService
+            self.service = DecoyService()
+            logger.info("✅ DecoyService initialized successfully")
+        except Exception as e:
+            logger.error(f"❌ Failed to load DecoyService: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+            self.service = None
+    
+    def handle_client(self, conn: socket.socket, addr: str):
+        """Handle individual client connection"""
+        try:
+            logger.debug(f"Client connected: {addr}")
+            
+            # Receive request
+            request_data = b''
+            while True:
+                chunk = conn.recv(4096)
+                if not chunk:
+                    break
+                request_data += chunk
+                # Check if we have a complete JSON message
+                try:
+                    request = json.loads(request_data.decode('utf-8'))
+                    break
+                except json.JSONDecodeError:
+                    continue
+            
+            if not request_data:
+                return
+            
+            try:
+                request = json.loads(request_data.decode('utf-8'))
+            except json.JSONDecodeError as e:
+                response = {'success': False, 'error': f'Invalid JSON: {e}'}
+                conn.sendall(json.dumps(response).encode('utf-8'))
+                return
+            
+            # Process command
+            response = self.process_command(request)
+            
+            # Send response
+            response_json = json.dumps(response).encode('utf-8')
+            conn.sendall(response_json)
+            
+        except Exception as e:
+            logger.error(f"Error handling client: {e}")
+            try:
+                response = {'success': False, 'error': str(e)}
+                conn.sendall(json.dumps(response).encode('utf-8'))
+            except:
+                pass
+        finally:
+            conn.close()
+    
+    def process_command(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Process incoming command"""
+        command = request.get('command', 'unknown')
+        
+        if command == 'start':
+            return self.cmd_start()
+        elif command == 'stop':
+            return self.cmd_stop()
+        elif command == 'status':
+            return self.cmd_status()
+        elif command == 'activity-log':
+            return self.cmd_activity_log()
+        elif command == 'shutdown':
+            return self.cmd_shutdown()
+        else:
+            return {'success': False, 'error': f'Unknown command: {command}'}
+    
+    def cmd_start(self) -> Dict[str, Any]:
+        """Start the automation service"""
+        try:
+            if not self.service:
+                return {'success': False, 'error': 'Service not initialized'}
+            
+            if self.service_active:
+                return {'success': True, 'message': 'Service already running'}
+            
+            logger.info("Starting Decoy Service")
+            # Start service in a separate thread so daemon stays responsive
+            service_thread = threading.Thread(
+                target=lambda: self.service.start_session(),
+                daemon=False
+            )
+            service_thread.start()
+            self.service_active = True
+            
+            return {'success': True, 'message': 'Service started'}
+        except Exception as e:
+            logger.error(f"Failed to start service: {e}")
+            return {'success': False, 'error': str(e)}
+    
+    def cmd_stop(self) -> Dict[str, Any]:
+        """Stop the automation service"""
+        try:
+            if not self.service:
+                return {'success': False, 'error': 'Service not initialized'}
+            
+            if not self.service_active:
+                return {'success': True, 'message': 'Service already stopped'}
+            
+            logger.info("Stopping Decoy Service")
+            self.service.stop_session()
+            self.service_active = False
+            
+            return {'success': True, 'message': 'Service stopped'}
+        except Exception as e:
+            logger.error(f"Failed to stop service: {e}")
+            return {'success': False, 'error': str(e)}
+    
+    def cmd_status(self) -> Dict[str, Any]:
+        """Get service status"""
+        try:
+            if not self.service:
+                return {'success': False, 'error': 'Service not initialized'}
+            
+            status = {
+                'daemon_running': True,
+                'service_active': self.service_active,
+                'socket_path': str(SOCKET_PATH),
+            }
+            
+            # Try to get service stats
+            try:
+                if hasattr(self.service, 'get_status'):
+                    status.update(self.service.get_status())
+            except:
+                pass
+            
+            return {'success': True, 'status': status}
+        except Exception as e:
+            logger.error(f"Failed to get status: {e}")
+            return {'success': False, 'error': str(e)}
+    
+    def cmd_activity_log(self) -> Dict[str, Any]:
+        """Get activity log"""
+        try:
+            log_file = log_dir / 'service.log'
+            if not log_file.exists():
+                return {'success': True, 'activities': []}
+            
+            with open(log_file, 'r') as f:
+                lines = f.readlines()
+            
+            activities = []
+            for line in lines[-20:]:  # Last 20 activities
+                if 'Visited:' in line or 'Searched:' in line:
+                    activities.append(line.strip())
+            
+            return {'success': True, 'activities': activities}
+        except Exception as e:
+            logger.error(f"Failed to read activity log: {e}")
+            return {'success': False, 'error': str(e)}
+    
+    def cmd_shutdown(self) -> Dict[str, Any]:
+        """Shutdown the daemon"""
+        logger.info("Shutdown command received")
+        self.running = False
+        return {'success': True, 'message': 'Daemon shutting down'}
+    
+    def start(self):
+        """Start the daemon server"""
+        logger.info(f"Starting Decoy Daemon on {SOCKET_PATH}")
+        
+        # Remove old socket if exists
+        if SOCKET_PATH.exists():
+            SOCKET_PATH.unlink()
+        
+        # Setup signal handlers
+        signal.signal(signal.SIGTERM, self._signal_handler)
+        signal.signal(signal.SIGINT, self._signal_handler)
+        
+        try:
+            # Create Unix socket
+            self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            self.socket.bind(str(SOCKET_PATH))
+            SOCKET_PATH.chmod(0o600)
+            self.socket.listen(5)
+            
+            logger.info(f"Daemon listening on {SOCKET_PATH}")
+            
+            # Accept connections
+            while self.running:
+                try:
+                    conn, addr = self.socket.accept()
+                    # Handle in thread to accept multiple clients
+                    client_thread = threading.Thread(
+                        target=self.handle_client,
+                        args=(conn, addr),
+                        daemon=True
+                    )
+                    client_thread.start()
+                    self.client_threads.append(client_thread)
+                except socket.timeout:
+                    continue
+                except Exception as e:
+                    if self.running:
+                        logger.error(f"Error accepting connection: {e}")
+        
+        except Exception as e:
+            logger.error(f"Failed to start daemon: {e}")
+            sys.exit(1)
+        finally:
+            self.shutdown()
+    
+    def shutdown(self):
+        """Cleanup and shutdown"""
+        logger.info("Shutting down daemon")
+        
+        if self.socket:
+            self.socket.close()
+        
+        if SOCKET_PATH.exists():
+            SOCKET_PATH.unlink()
+        
+        # Wait for client threads
+        for thread in self.client_threads:
+            thread.join(timeout=1.0)
+        
+        logger.info("Daemon stopped")
+    
+    def _signal_handler(self, signum, frame):
+        """Handle signals"""
+        logger.info(f"Received signal {signum}")
+        self.running = False
 
 
 def main():
-    logger.info(f"Starting Decoy Service daemon on http://localhost:{API_PORT}")
-    app.run(
-        host="localhost",
-        port=API_PORT,
-        debug=False,
-        use_reloader=False,
-    )
+    # Set working directory to decoy_service directory for proper relative imports
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    service_dir = os.path.join(script_dir, 'decoy_service')
+    os.chdir(service_dir)
+    
+    daemon = DecoyDaemon()
+    daemon.start()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
