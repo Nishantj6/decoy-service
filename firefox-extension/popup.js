@@ -33,9 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function fetchServiceStatus() {
-    // Get real status from API
-    fetch('http://localhost:9999/api/status')
-        .then(response => response.json())
+    // Get real status from daemon via IPC client
+    daemonClient.status()
         .then(data => {
             serviceStatus.isRunning = data.running || false;
             serviceStatus.stats = data.stats || {
@@ -63,53 +62,41 @@ function fetchServiceStatus() {
 function startService() {
     showNotification('Starting service...');
     
-    fetch('http://localhost:9999/api/start', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            serviceStatus.isRunning = true;
-            serviceStatus.sessionStartTime = Date.now();
-            showNotification('Decoy Service started!');
-            fetchServiceStatus();
-        } else {
-            showNotification('Failed to start service: ' + (data.error || 'Unknown error'), 'error');
-        }
-    })
-    .catch(error => {
-        showNotification('Error: ' + error.message, 'error');
-        console.error('Error starting service:', error);
-    });
+    daemonClient.start()
+        .then(data => {
+            if (data.success) {
+                serviceStatus.isRunning = true;
+                serviceStatus.sessionStartTime = Date.now();
+                showNotification('Decoy Service started!');
+                fetchServiceStatus();
+            } else {
+                showNotification('Failed to start service: ' + (data.error || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            showNotification('Error: ' + error.message, 'error');
+            console.error('Error starting service:', error);
+        });
 }
 
 function stopService() {
     showNotification('Stopping service...');
     
-    fetch('http://localhost:9999/api/stop', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            serviceStatus.isRunning = false;
-            serviceStatus.sessionStartTime = null;
-            showNotification('Decoy Service stopped');
-            fetchServiceStatus();
-        } else {
-            showNotification('Failed to stop service: ' + (data.error || 'Unknown error'), 'error');
-        }
-    })
-    .catch(error => {
-        showNotification('Error: ' + error.message, 'error');
-        console.error('Error stopping service:', error);
-    });
+    daemonClient.stop()
+        .then(data => {
+            if (data.success) {
+                serviceStatus.isRunning = false;
+                serviceStatus.sessionStartTime = null;
+                showNotification('Decoy Service stopped');
+                fetchServiceStatus();
+            } else {
+                showNotification('Failed to stop service: ' + (data.error || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            showNotification('Error: ' + error.message, 'error');
+            console.error('Error stopping service:', error);
+        });
 }
 
 function updateUI() {

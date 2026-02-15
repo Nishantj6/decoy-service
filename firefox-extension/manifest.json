@@ -10,7 +10,6 @@
     "webRequest",
     "tabs"
   ],
-  
   "icons": {
     "16": "icons/icon-16.svg",
     "48": "icons/icon-48.svg",
@@ -18,6 +17,15 @@
   },
   
   "action": {
+    "default_title": "Decoy Service",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.svg",
+      "48": "icons/icon-48.svg",
+      "128": "icons/icon-128.svg"
+    }
+  },
+  "browser_action": {
     "default_title": "Decoy Service",
     "default_popup": "popup.html",
     "default_icon": {

@@ -7,8 +7,8 @@
     
     <key>ProgramArguments</key>
     <array>
-        <string>{{PYTHON_BIN}}</string>
-        <string>{{DECOY_SERVICE_PATH}}/api_server.py</string>
+        <string>/usr/bin/python3</string>
+        <string>{{DECOY_SERVICE_PATH}}/daemon.py</string>
     </array>
     
     <key>WorkingDirectory</key>
@@ -21,10 +21,10 @@
     <true/>
     
     <key>StandardOutPath</key>
-    <string>{{USER_HOME}}/.decoy-service/daemon-stdout.log</string>
+    <string>{{DECOY_SERVICE_PATH}}/.decoy-service/daemon-stdout.log</string>
     
     <key>StandardErrorPath</key>
-    <string>{{USER_HOME}}/.decoy-service/daemon-stderr.log</string>
+    <string>{{DECOY_SERVICE_PATH}}/.decoy-service/daemon-stderr.log</string>
     
     <key>EnvironmentVariables</key>
     <dict>

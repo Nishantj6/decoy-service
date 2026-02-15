@@ -105,8 +105,7 @@ function loadActivityLog() {
     const logDiv = document.getElementById('activity-log');
     logDiv.innerHTML = '<p class="loading">Loading activity log...</p>';
 
-    fetch('http://localhost:9999/api/activity-log')
-        .then(response => response.json())
+    daemonClient.activityLog()
         .then(data => {
             if (data.success && data.activities.length > 0) {
                 logDiv.innerHTML = '';

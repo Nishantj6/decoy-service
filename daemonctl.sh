@@ -19,6 +19,7 @@ Usage: ./daemonctl.sh <command>
 
 Commands:
   install    Install + start LaunchAgent
+  sync       Restage latest project code into daemon runtime path
   start      Start daemon (or restart if already loaded)
   stop       Stop daemon
   restart    Restart daemon
@@ -157,6 +158,13 @@ uninstall_daemon() {
   echo "Removed ${TARGET_PLIST}"
 }
 
+sync_runtime() {
+  mkdir -p "${RUNTIME_DIR}"
+  stage_runtime_files
+  echo "Staged latest code to ${APP_DIR}"
+  echo "Run ./daemonctl.sh restart to apply staged changes."
+}
+
 tail_logs() {
   mkdir -p "${RUNTIME_DIR}"
   touch "${STDOUT_LOG}" "${STDERR_LOG}"
@@ -168,6 +176,9 @@ main() {
   case "${command}" in
     install)
       install_daemon
+      ;;
+    sync)
+      sync_runtime
       ;;
     start)
       start_daemon

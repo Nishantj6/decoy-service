@@ -98,6 +98,10 @@ tail -f logs/decoy_service.log
 # Verify daemon + API health
 ./daemonctl.sh status
 
+# After editing code, restage daemon runtime files
+./daemonctl.sh sync
+./daemonctl.sh restart
+
 # View daemon logs
 ./daemonctl.sh logs
 ```
