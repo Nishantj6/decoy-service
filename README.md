@@ -265,6 +265,49 @@ browser:
 
 ## Troubleshooting
 
+### Daemon fails to start on macOS (Operation not permitted)
+
+**Symptom**: LaunchAgent shows "Operation not permitted" in error logs, or daemon fails to create socket.
+
+**Cause**: macOS security protections for the Documents folder prevent LaunchAgent processes from accessing files there.
+
+**Solutions** (choose one):
+
+1. **Move project to a different location** (Recommended):
+   ```bash
+   # Move to a non-protected directory
+   sudo mkdir -p /usr/local/decoy-service
+   sudo chown $USER /usr/local/decoy-service
+   mv ~/Documents/Automation/Decoy/Claude/* /usr/local/decoy-service/
+
+   # Reinstall daemon from new location
+   cd /usr/local/decoy-service
+   ./daemonctl.sh uninstall
+   ./setup-daemon.sh
+   ```
+
+2. **Use Homebrew Python**:
+   ```bash
+   # Install Homebrew Python (if not already installed)
+   brew install python@3.11
+
+   # Update plist to use Homebrew Python
+   # Edit ~/Library/LaunchAgents/com.decoy-service.daemon.plist
+   # Change ProgramArguments to use: /opt/homebrew/bin/python3
+   ```
+
+3. **Grant Full Disk Access** (Not recommended for security):
+   - System Settings → Privacy & Security → Full Disk Access
+   - Click "+" and add Python executable
+   - Note: This grants broad permissions
+
+**Verify fix**:
+```bash
+./daemonctl.sh status
+ls -la ~/.decoy-service/daemon.sock  # Should exist
+python3 decoy_service/daemon_client.py  # Should connect
+```
+
 ### Chrome/ChromeDriver not found
 ```bash
 # Install Chrome/Chromium via Homebrew (macOS)
@@ -288,6 +331,22 @@ playwright install
 - Increase `click_interval_min` and `click_interval_max`
 - Decrease number of clicks per page
 - Add random delays
+
+### Daemon client: "Socket not found"
+```bash
+# Check if daemon is running
+./daemonctl.sh status
+
+# Check if socket exists
+ls -la ~/.decoy-service/daemon.sock
+
+# Restart daemon
+./daemonctl.sh restart
+
+# View logs for errors
+./daemonctl.sh logs
+tail -f ~/.decoy-service/daemon-stderr.log
+```
 
 ## Performance Considerations
 

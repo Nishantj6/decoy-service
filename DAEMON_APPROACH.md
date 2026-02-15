@@ -166,13 +166,37 @@ systemctl --user stop decoy-daemon.service
 
 ## Known Issues / TODO
 
+### Completed ✅
+- [x] Socket timeout handling - Added 5s timeout in daemon_client.py
+- [x] Fix plist log paths to use HOME directory
+- [x] Fix working directory handling in daemon.py
+- [x] Update documentation with daemon usage
+
+### In Progress
 - [ ] Update Firefox extension to use daemon_client instead of HTTP calls
+  - Currently uses HTTP fallback due to browser sandbox limitations
+  - Firefox extension requires both daemon.py and api_server.py running
 - [ ] Test on Linux with systemd
 - [ ] Test on Windows (need Task Scheduler script)
+
+### Future Enhancements
 - [ ] Add daemon restart/crash recovery
 - [ ] Add daemon health checks
-- [ ] Socket timeout handling
 - [ ] Multi-user support
+- [ ] Native messaging bridge for Firefox extension
+
+### Known Deployment Issues
+
+**macOS Documents Folder Permissions**
+
+If the project is located in the Documents folder, LaunchAgent may fail with "Operation not permitted" due to macOS security protections.
+
+**Solutions**:
+1. Move project to `/usr/local/decoy-service/` or `~/Applications/`
+2. Use Homebrew Python instead of system Python
+3. Grant Full Disk Access (not recommended for security)
+
+See README Troubleshooting section for detailed instructions.
 
 ## Comparing Branches
 
