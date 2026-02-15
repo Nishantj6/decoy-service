@@ -254,7 +254,7 @@ class DecoyDaemon:
     def cmd_activity_log(self) -> Dict[str, Any]:
         """Get activity log - format for Firefox extension compatibility"""
         try:
-            log_file = log_dir / 'service.log'
+            log_file = log_dir / 'daemon.log'
             if not log_file.exists():
                 return {'success': True, 'activities': []}
 
