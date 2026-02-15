@@ -105,7 +105,9 @@ class DecoyDaemon:
             # Import from the decoy_service module directly
             sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
             from decoy_service.decoy_service import DecoyService
-            self.service = DecoyService()
+            # Use correct config path
+            config_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'decoy_service', 'config')
+            self.service = DecoyService(config_dir=config_dir)
             logger.info("✅ DecoyService initialized successfully")
         except Exception as e:
             logger.error(f"❌ Failed to load DecoyService: {e}")
