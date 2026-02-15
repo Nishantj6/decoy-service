@@ -105,7 +105,7 @@ class SeleniumAgent(BrowserAgent):
         """Get clickable elements"""
         try:
             elements = self.driver.find_elements(self.By.XPATH, 
-                "//a | //button | //[contains(@onclick, '')] | //input[@type='button']"
+                "//a | //button | //*[contains(@onclick, '')] | //input[@type='button']"
             )
             return elements[:max_elements]
         except Exception as e:
