@@ -60,45 +60,90 @@ class DecoyService:
         return RandomnessGenerator.get_random_element(queries)
     
     def _interact_with_page(self):
-        """Perform random interactions on current page"""
+        """Perform deep, natural interactions on current page"""
         config = self.settings.get('clicking', {})
-        clicks_min = config.get('clicks_per_page_min', 1)
-        clicks_max = config.get('clicks_per_page_max', 5)
-        num_clicks = random.randint(clicks_min, clicks_max)
-        
-        for _ in range(num_clicks):
-            if self.agent.random_click():
-                self.tracker.record_click()
-            
-            delay = RandomnessGenerator.get_random_delay(2, 5)
-            time.sleep(delay)
-        
-        # Scroll page
-        if config.get('enable_scrolling', True):
-            scroll_amount = random.randint(300, 1000)
-            self.agent.scroll_page(scroll_amount)
-            time.sleep(1)
+
+        # Handle popups first (cookie banners, etc.)
+        self.agent.handle_popups()
+        time.sleep(random.uniform(0.5, 1.0))
+
+        # Choose interaction style: deep reading vs quick browsing
+        interaction_style = random.choice(['deep_read', 'quick_browse', 'media_focus'])
+
+        if interaction_style == 'deep_read':
+            # Natural scrolling as if reading an article
+            self.logger.debug("Deep reading interaction")
+            if config.get('enable_scrolling', True):
+                self.agent.natural_scroll()
+
+            # Occasional clicks while reading
+            num_clicks = random.randint(1, 2)
+            for _ in range(num_clicks):
+                if self.agent.random_click():
+                    self.tracker.record_click()
+                time.sleep(random.uniform(1.5, 3.0))
+
+        elif interaction_style == 'media_focus':
+            # Focus on images and videos
+            self.logger.debug("Media-focused interaction")
+            self.agent.interact_with_media()
+
+            # Some scrolling to find more media
+            if config.get('enable_scrolling', True):
+                scroll_amount = random.randint(300, 600)
+                self.agent.scroll_page(scroll_amount)
+                time.sleep(random.uniform(1.0, 2.0))
+                self.agent.interact_with_media()
+
+        else:  # quick_browse
+            # Quick scanning with multiple clicks
+            self.logger.debug("Quick browsing interaction")
+            clicks_min = config.get('clicks_per_page_min', 1)
+            clicks_max = config.get('clicks_per_page_max', 5)
+            num_clicks = random.randint(clicks_min, clicks_max)
+
+            for _ in range(num_clicks):
+                if self.agent.random_click():
+                    self.tracker.record_click()
+
+                delay = RandomnessGenerator.get_random_delay(2, 5)
+                time.sleep(delay)
+
+            # Basic scrolling
+            if config.get('enable_scrolling', True):
+                scroll_amount = random.randint(300, 1000)
+                self.agent.scroll_page(scroll_amount)
+                time.sleep(1)
     
     def _visit_and_interact(self):
-        """Visit a website and interact with it"""
+        """Visit a website and interact with it naturally"""
         website = self._get_random_website()
-        
+
         self.logger.info(f"Visiting: {website}")
-        
+
         if self.agent.visit_url(website):
             self.tracker.record_website_visit(website)
-            
-            # Random dwell time
+
+            # Initial page load pause (human-like)
+            time.sleep(random.uniform(1.5, 3.0))
+
+            # Random dwell time - longer for "interesting" pages
             activity_config = self.settings.get('activity', {})
             dwell_min = activity_config.get('page_dwell_min', 5)
             dwell_max = activity_config.get('page_dwell_max', 30)
+
+            # Occasionally spend much longer (found something interesting)
+            if random.random() < 0.15:  # 15% chance
+                dwell_max = dwell_max * 2  # Double the time
+                self.logger.debug("Extended visit - 'interesting' content")
+
             dwell_time = RandomnessGenerator.get_random_delay(dwell_min, dwell_max)
-            
-            # Interact with page
+
+            # Deep interaction with the page
             self._interact_with_page()
-            
-            # Wait
-            remaining_time = dwell_time - 5  # Account for interaction time
+
+            # Remaining dwell time for final "reading"
+            remaining_time = dwell_time - 10  # Account for interaction time
             if remaining_time > 0:
                 time.sleep(remaining_time)
     

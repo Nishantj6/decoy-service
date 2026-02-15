@@ -30,10 +30,16 @@ clicking:
   # Number of random clicks per page
   clicks_per_page_min: 1
   clicks_per_page_max: 5
-  
+
   # Enable scrolling
   enable_scrolling: true
-  
+
+  # Enable natural scrolling (reads like human)
+  enable_natural_scrolling: true
+
+  # Enable deep interactions (videos, images, hovering)
+  enable_deep_interactions: true
+
   # Enable form interactions (filling fields, etc)
   enable_form_interaction: false
 

@@ -43,7 +43,22 @@ class BrowserAgent(ABC):
     def scroll_page(self, amount: int = 500):
         """Scroll the page"""
         pass
-    
+
+    @abstractmethod
+    def natural_scroll(self):
+        """Scroll naturally like reading an article"""
+        pass
+
+    @abstractmethod
+    def hover_element(self, element):
+        """Hover over an element"""
+        pass
+
+    @abstractmethod
+    def get_page_height(self) -> int:
+        """Get total page height"""
+        pass
+
     @abstractmethod
     def close_browser(self):
         """Close browser instance"""
@@ -136,6 +151,119 @@ class SeleniumAgent(BrowserAgent):
             self.logger.debug(f"Scrolled {amount}px")
         except Exception as e:
             self.logger.debug(f"Scroll failed: {str(e)}")
+
+    def natural_scroll(self):
+        """Scroll naturally like reading an article - simulates human reading behavior"""
+        try:
+            page_height = self.get_page_height()
+            current_position = 0
+
+            # Scroll in smaller increments like reading
+            while current_position < page_height * 0.8:  # Don't scroll to absolute bottom
+                # Variable scroll amounts (reading different sections)
+                scroll_amount = random.randint(150, 400)
+
+                # Scroll down
+                self.driver.execute_script(f"window.scrollBy(0, {scroll_amount});")
+                current_position += scroll_amount
+
+                # Reading pause - longer for larger scrolls (more content)
+                reading_time = random.uniform(1.5, 4.0) if scroll_amount > 250 else random.uniform(0.8, 2.0)
+                time.sleep(reading_time)
+
+                # Occasionally scroll up a bit (re-reading)
+                if random.random() < 0.15:  # 15% chance
+                    scroll_up = random.randint(50, 150)
+                    self.driver.execute_script(f"window.scrollBy(0, -{scroll_up});")
+                    current_position -= scroll_up
+                    time.sleep(random.uniform(0.5, 1.5))
+
+                # Occasionally pause longer (looking at images, thinking)
+                if random.random() < 0.2:  # 20% chance
+                    time.sleep(random.uniform(2.0, 5.0))
+
+            self.logger.debug("Natural scroll completed")
+            return True
+
+        except Exception as e:
+            self.logger.debug(f"Natural scroll failed: {str(e)}")
+            return False
+
+    def hover_element(self, element):
+        """Hover over an element to simulate mouse movement"""
+        try:
+            from selenium.webdriver.common.action_chains import ActionChains
+            action = ActionChains(self.driver)
+            action.move_to_element(element).perform()
+            time.sleep(random.uniform(0.3, 0.8))
+            return True
+        except Exception as e:
+            self.logger.debug(f"Hover failed: {str(e)}")
+            return False
+
+    def get_page_height(self) -> int:
+        """Get total page height"""
+        try:
+            return self.driver.execute_script("return document.body.scrollHeight")
+        except:
+            return 2000  # Default fallback
+
+    def interact_with_media(self):
+        """Interact with videos, images, and galleries on the page"""
+        try:
+            # Look for videos
+            videos = self.driver.find_elements(self.By.TAG_NAME, 'video')
+            if videos and random.random() < 0.3:  # 30% chance to interact with video
+                video = random.choice(videos)
+                self.hover_element(video)
+                # Scroll to video
+                self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", video)
+                time.sleep(random.uniform(2, 5))  # "Watch" for a bit
+                self.logger.debug("Interacted with video")
+
+            # Look for image galleries
+            images = self.driver.find_elements(self.By.TAG_NAME, 'img')
+            if len(images) > 3:
+                # "Look at" a few images
+                num_images = min(random.randint(2, 4), len(images))
+                for _ in range(num_images):
+                    img = random.choice(images)
+                    self.hover_element(img)
+                    time.sleep(random.uniform(0.8, 2.0))
+                self.logger.debug(f"Viewed {num_images} images")
+
+            return True
+        except Exception as e:
+            self.logger.debug(f"Media interaction failed: {str(e)}")
+            return False
+
+    def handle_popups(self):
+        """Try to close common popups, cookie banners, modals"""
+        try:
+            # Common close button selectors
+            close_selectors = [
+                "button[aria-label*='close' i]",
+                "button[aria-label*='dismiss' i]",
+                ".close", ".modal-close", "[class*='close']",
+                "button:has-text('Accept')", "button:has-text('OK')",
+                "[class*='cookie'] button", "[id*='cookie'] button"
+            ]
+
+            for selector in close_selectors:
+                try:
+                    elements = self.driver.find_elements(self.By.CSS_SELECTOR, selector)
+                    if elements:
+                        elements[0].click()
+                        time.sleep(0.5)
+                        self.logger.debug("Closed popup/banner")
+                        return True
+                except:
+                    continue
+
+            return False
+        except Exception as e:
+            self.logger.debug(f"Popup handling failed: {str(e)}")
+            return False
     
     def fill_search_form(self, query: str) -> bool:
         """Find and fill a search form"""
@@ -250,7 +378,102 @@ class PlaywrightAgent(BrowserAgent):
             self.logger.debug(f"Scrolled {amount}px")
         except Exception as e:
             self.logger.debug(f"Scroll failed: {str(e)}")
-    
+
+    def natural_scroll(self):
+        """Scroll naturally like reading an article"""
+        try:
+            page_height = self.get_page_height()
+            current_position = 0
+
+            while current_position < page_height * 0.8:
+                scroll_amount = random.randint(150, 400)
+                self.page.evaluate(f"window.scrollBy(0, {scroll_amount})")
+                current_position += scroll_amount
+
+                reading_time = random.uniform(1.5, 4.0) if scroll_amount > 250 else random.uniform(0.8, 2.0)
+                time.sleep(reading_time)
+
+                if random.random() < 0.15:
+                    scroll_up = random.randint(50, 150)
+                    self.page.evaluate(f"window.scrollBy(0, -{scroll_up})")
+                    current_position -= scroll_up
+                    time.sleep(random.uniform(0.5, 1.5))
+
+                if random.random() < 0.2:
+                    time.sleep(random.uniform(2.0, 5.0))
+
+            self.logger.debug("Natural scroll completed")
+            return True
+        except Exception as e:
+            self.logger.debug(f"Natural scroll failed: {str(e)}")
+            return False
+
+    def hover_element(self, element):
+        """Hover over an element"""
+        try:
+            element.hover()
+            time.sleep(random.uniform(0.3, 0.8))
+            return True
+        except Exception as e:
+            self.logger.debug(f"Hover failed: {str(e)}")
+            return False
+
+    def get_page_height(self) -> int:
+        """Get total page height"""
+        try:
+            return self.page.evaluate("document.body.scrollHeight")
+        except:
+            return 2000
+
+    def interact_with_media(self):
+        """Interact with videos and images"""
+        try:
+            videos = self.page.query_selector_all('video')
+            if videos and random.random() < 0.3:
+                video = random.choice(videos)
+                video.scroll_into_view_if_needed()
+                time.sleep(random.uniform(2, 5))
+                self.logger.debug("Interacted with video")
+
+            images = self.page.query_selector_all('img')
+            if len(images) > 3:
+                num_images = min(random.randint(2, 4), len(images))
+                for _ in range(num_images):
+                    img = random.choice(images)
+                    self.hover_element(img)
+                    time.sleep(random.uniform(0.8, 2.0))
+                self.logger.debug(f"Viewed {num_images} images")
+
+            return True
+        except Exception as e:
+            self.logger.debug(f"Media interaction failed: {str(e)}")
+            return False
+
+    def handle_popups(self):
+        """Close common popups and cookie banners"""
+        try:
+            close_selectors = [
+                "button[aria-label*='close' i]",
+                ".close", ".modal-close",
+                "button:has-text('Accept')", "button:has-text('OK')"
+            ]
+
+            for selector in close_selectors:
+                try:
+                    element = self.page.query_selector(selector)
+                    if element:
+                        element.click()
+                        time.sleep(0.5)
+                        self.logger.debug("Closed popup/banner")
+                        return True
+                except:
+                    continue
+
+            return False
+        except Exception as e:
+            self.logger.debug(f"Popup handling failed: {str(e)}")
+            return False
+
     def close_browser(self):
         """Close browser"""
         try:
