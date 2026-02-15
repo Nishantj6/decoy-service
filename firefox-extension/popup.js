@@ -36,22 +36,24 @@ function fetchServiceStatus() {
     // Get real status from daemon via IPC client
     daemonClient.status()
         .then(data => {
+            const wasRunning = serviceStatus.isRunning;
             serviceStatus.isRunning = data.running || false;
             serviceStatus.stats = data.stats || {
                 sitesVisited: 0,
                 clicksMade: 0,
                 searchesPerformed: 0
             };
-            
-            // Use actual session duration from API instead of local tracking
-            if (serviceStatus.isRunning && data.stats && data.stats.sessionDurationMinutes !== undefined) {
-                // Calculate start time from duration
-                const durationSeconds = (data.stats.sessionDurationMinutes || 0) * 60;
+
+            // Only set session start time once when service first starts
+            if (serviceStatus.isRunning && !wasRunning) {
+                // Service just started - set start time from API duration
+                const durationSeconds = (data.stats?.sessionDurationMinutes || 0) * 60;
                 serviceStatus.sessionStartTime = Date.now() - (durationSeconds * 1000);
             } else if (!serviceStatus.isRunning) {
                 serviceStatus.sessionStartTime = null;
             }
-            
+            // If service was already running, keep the existing sessionStartTime so timer counts up
+
             updateUI();
         })
         .catch(error => {

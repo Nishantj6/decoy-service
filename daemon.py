@@ -252,20 +252,45 @@ class DecoyDaemon:
             return {'success': False, 'error': str(e)}
     
     def cmd_activity_log(self) -> Dict[str, Any]:
-        """Get activity log"""
+        """Get activity log - format for Firefox extension compatibility"""
         try:
             log_file = log_dir / 'service.log'
             if not log_file.exists():
                 return {'success': True, 'activities': []}
-            
+
             with open(log_file, 'r') as f:
                 lines = f.readlines()
-            
+
             activities = []
             for line in lines[-20:]:  # Last 20 activities
+                # Parse log format: "2024-01-01 12:00:00 - ... - INFO - Visited: https://example.com"
                 if 'Visited:' in line or 'Searched:' in line:
-                    activities.append(line.strip())
-            
+                    try:
+                        # Extract timestamp (first part before ' - ')
+                        parts = line.split(' - ')
+                        if len(parts) >= 4:
+                            timestamp = parts[0].strip()
+                            message = parts[3].strip()
+
+                            # Determine type and detail
+                            if 'Visited:' in message:
+                                activity_type = 'visit'
+                                detail = message.replace('Visited:', '').strip()
+                            elif 'Searched:' in message:
+                                activity_type = 'search'
+                                detail = message.replace('Searched:', '').strip()
+                            else:
+                                continue
+
+                            activities.append({
+                                'timestamp': timestamp,
+                                'type': activity_type,
+                                'detail': detail
+                            })
+                    except Exception as parse_error:
+                        logger.debug(f"Failed to parse log line: {parse_error}")
+                        continue
+
             return {'success': True, 'activities': activities}
         except Exception as e:
             logger.error(f"Failed to read activity log: {e}")
