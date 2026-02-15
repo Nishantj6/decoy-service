@@ -14,6 +14,8 @@ import logging
 import threading
 from pathlib import Path
 from typing import Dict, Any
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from urllib.parse import urlparse, parse_qs
 
 # Setup logging
 log_dir = Path.home() / '.decoy-service'
@@ -30,6 +32,63 @@ logging.basicConfig(
 logger = logging.getLogger('DecoyDaemon')
 
 SOCKET_PATH = log_dir / 'daemon.sock'
+HTTP_PORT = 9999  # Port for Firefox extension HTTP bridge
+
+
+class HTTPBridgeHandler(BaseHTTPRequestHandler):
+    """HTTP request handler for Firefox extension compatibility"""
+
+    daemon_instance = None  # Will be set by DecoyDaemon
+
+    def log_message(self, format, *args):
+        """Override to use our logger"""
+        logger.info(f"HTTP {args[0]}")
+
+    def do_GET(self):
+        """Handle GET requests"""
+        parsed_path = urlparse(self.path)
+
+        if parsed_path.path == '/api/status':
+            response = self.daemon_instance.cmd_status()
+            self.send_json_response(response)
+        elif parsed_path.path == '/api/activity-log':
+            response = self.daemon_instance.cmd_activity_log()
+            self.send_json_response(response)
+        elif parsed_path.path == '/api/health':
+            self.send_json_response({'success': True, 'status': 'healthy'})
+        else:
+            self.send_error(404, "Not Found")
+
+    def do_POST(self):
+        """Handle POST requests"""
+        parsed_path = urlparse(self.path)
+
+        if parsed_path.path == '/api/start':
+            response = self.daemon_instance.cmd_start()
+            self.send_json_response(response)
+        elif parsed_path.path == '/api/stop':
+            response = self.daemon_instance.cmd_stop()
+            self.send_json_response(response)
+        else:
+            self.send_error(404, "Not Found")
+
+    def send_json_response(self, data):
+        """Send JSON response with CORS headers"""
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
+        self.wfile.write(json.dumps(data).encode('utf-8'))
+
+    def do_OPTIONS(self):
+        """Handle OPTIONS requests for CORS preflight"""
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
 
 
 class DecoyDaemon:
@@ -38,6 +97,8 @@ class DecoyDaemon:
         self.service_active = False
         self.socket = None
         self.client_threads = []
+        self.http_server = None
+        self.http_thread = None
         
         # Import service here to avoid early dependencies
         try:
@@ -209,14 +270,17 @@ class DecoyDaemon:
     def start(self):
         """Start the daemon server"""
         logger.info(f"Starting Decoy Daemon on {SOCKET_PATH}")
-        
+
         # Remove old socket if exists
         if SOCKET_PATH.exists():
             SOCKET_PATH.unlink()
-        
+
         # Setup signal handlers
         signal.signal(signal.SIGTERM, self._signal_handler)
         signal.signal(signal.SIGINT, self._signal_handler)
+
+        # Start HTTP bridge for Firefox extension
+        self._start_http_bridge()
         
         try:
             # Create Unix socket
@@ -254,19 +318,45 @@ class DecoyDaemon:
     def shutdown(self):
         """Cleanup and shutdown"""
         logger.info("Shutting down daemon")
-        
+
+        # Stop HTTP server
+        if self.http_server:
+            logger.info("Stopping HTTP bridge")
+            self.http_server.shutdown()
+            self.http_server.server_close()
+
         if self.socket:
             self.socket.close()
-        
+
         if SOCKET_PATH.exists():
             SOCKET_PATH.unlink()
-        
+
         # Wait for client threads
         for thread in self.client_threads:
             thread.join(timeout=1.0)
-        
+
         logger.info("Daemon stopped")
     
+    def _start_http_bridge(self):
+        """Start HTTP server for Firefox extension compatibility"""
+        try:
+            # Set daemon instance reference for HTTP handler
+            HTTPBridgeHandler.daemon_instance = self
+
+            # Create HTTP server
+            self.http_server = HTTPServer(('localhost', HTTP_PORT), HTTPBridgeHandler)
+
+            # Run HTTP server in separate thread
+            self.http_thread = threading.Thread(
+                target=self.http_server.serve_forever,
+                daemon=True
+            )
+            self.http_thread.start()
+            logger.info(f"✅ HTTP bridge started on http://localhost:{HTTP_PORT}")
+        except Exception as e:
+            logger.error(f"⚠️  Failed to start HTTP bridge: {e}")
+            logger.error("Firefox extension will not work, but Unix socket is still available")
+
     def _signal_handler(self, signum, frame):
         """Handle signals"""
         logger.info(f"Received signal {signum}")

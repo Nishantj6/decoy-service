@@ -124,10 +124,7 @@ print(result)
 
 Install the Firefox extension from the `firefox-extension/` directory to control the daemon via a browser popup UI.
 
-**Note**: The daemon communicates via Unix domain socket at `~/.decoy-service/daemon.sock`. For Firefox extension compatibility, you'll also need to run `api_server.py` as a fallback HTTP bridge:
-```bash
-python3 api_server.py
-```
+**Note**: The daemon automatically provides both Unix socket (for Python clients) and HTTP API (for Firefox extension) interfaces. The HTTP API runs on port 9999 and is started automatically when the daemon starts - no separate process needed!
 
 **Distributing to friends:**
 
