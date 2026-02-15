@@ -14,77 +14,99 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleBtn = document.getElementById('toggle-btn');
     const stopBtn = document.getElementById('stop-btn');
 
-    // Load status from storage
-    chrome.storage.local.get(['serviceRunning', 'sessionStats'], (result) => {
-        serviceStatus.isRunning = result.serviceRunning || false;
-        serviceStatus.stats = result.sessionStats || {
-            sitesVisited: 0,
-            clicksMade: 0,
-            searchesPerformed: 0
-        };
-
-        updateUI();
-    });
+    // Start fetching live status from API
+    fetchServiceStatus();
+    setInterval(fetchServiceStatus, 1000);
 
     // Toggle button listener
     toggleBtn.addEventListener('click', () => {
-        if (!serviceStatus.isRunning) {
-            startService();
-        }
+        startService();
     });
 
     // Stop button listener
     stopBtn.addEventListener('click', () => {
-        if (serviceStatus.isRunning) {
-            stopService();
-        }
+        stopService();
     });
 
     // Update UI every second
     setInterval(updateUI, 1000);
 });
 
+function fetchServiceStatus() {
+    // Get real status from API
+    fetch('http://localhost:9999/api/status')
+        .then(response => response.json())
+        .then(data => {
+            serviceStatus.isRunning = data.running || false;
+            serviceStatus.stats = data.stats || {
+                sitesVisited: 0,
+                clicksMade: 0,
+                searchesPerformed: 0
+            };
+            
+            // Set session start time if just started
+            if (serviceStatus.isRunning && !serviceStatus.sessionStartTime) {
+                serviceStatus.sessionStartTime = Date.now();
+            } else if (!serviceStatus.isRunning) {
+                serviceStatus.sessionStartTime = null;
+            }
+            
+            updateUI();
+        })
+        .catch(error => {
+            console.error('Error fetching status:', error);
+        });
+}
+
 function startService() {
-    // Send message to background script
-    chrome.runtime.sendMessage({
-        action: 'startService'
-    }, (response) => {
-        if (response && response.success) {
+    showNotification('Starting service...');
+    
+    fetch('http://localhost:9999/api/start', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
             serviceStatus.isRunning = true;
             serviceStatus.sessionStartTime = Date.now();
-            
-            // Save to storage
-            chrome.storage.local.set({
-                serviceRunning: true,
-                sessionStartTime: serviceStatus.sessionStartTime
-            });
-
             showNotification('Decoy Service started!');
-            updateUI();
+            fetchServiceStatus();
         } else {
-            showNotification('Failed to start service', 'error');
+            showNotification('Failed to start service: ' + (data.error || 'Unknown error'), 'error');
         }
+    })
+    .catch(error => {
+        showNotification('Error: ' + error.message, 'error');
+        console.error('Error starting service:', error);
     });
 }
 
 function stopService() {
-    // Send message to background script
-    chrome.runtime.sendMessage({
-        action: 'stopService'
-    }, (response) => {
-        if (response && response.success) {
-            serviceStatus.isRunning = false;
-            
-            // Save to storage
-            chrome.storage.local.set({
-                serviceRunning: false
-            });
-
-            showNotification('Decoy Service stopped');
-            updateUI();
-        } else {
-            showNotification('Failed to stop service', 'error');
+    showNotification('Stopping service...');
+    
+    fetch('http://localhost:9999/api/stop', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
         }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            serviceStatus.isRunning = false;
+            serviceStatus.sessionStartTime = null;
+            showNotification('Decoy Service stopped');
+            fetchServiceStatus();
+        } else {
+            showNotification('Failed to stop service: ' + (data.error || 'Unknown error'), 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('Error: ' + error.message, 'error');
+        console.error('Error stopping service:', error);
     });
 }
 
@@ -140,14 +162,9 @@ function showNotification(message, type = 'success') {
 
 // Listen for messages from background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'updateStats') {
-        serviceStatus.stats = request.stats;
-        
-        // Save to storage
-        chrome.storage.local.set({
-            sessionStats: serviceStatus.stats
-        });
-
+    if (request.action === 'statusUpdate') {
+        serviceStatus.isRunning = request.running;
+        serviceStatus.stats = request.stats || serviceStatus.stats;
         updateUI();
     }
 });
