@@ -29,6 +29,7 @@ logger = logging.getLogger('DecoyAPI')
 service = None
 service_thread = None
 scheduler = None
+activity_log = []  # Track activity log
 
 # Port for the API
 API_PORT = 9999
@@ -200,6 +201,52 @@ def schedule_service():
         
     except Exception as e:
         logger.error(f'Error scheduling service: {str(e)}')
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/activity-log', methods=['GET'])
+def get_activity_log():
+    """Get activity log with timestamps"""
+    try:
+        # Read from log file
+        import re
+        from datetime import datetime
+        
+        log_file = 'logs/decoy_service.log'
+        activities = []
+        
+        if os.path.exists(log_file):
+            try:
+                with open(log_file, 'r') as f:
+                    lines = f.readlines()
+                    # Get last 50 activities
+                    for line in lines[-50:]:
+                        # Parse log lines that contain Visited:, Searched:, Clicked:, Form filled
+                        if 'Visited:' in line:
+                            match = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*Visited: (.+)', line)
+                            if match:
+                                activities.append({
+                                    'type': 'visit',
+                                    'timestamp': match.group(1),
+                                    'detail': match.group(2).strip()
+                                })
+                        elif 'Searched:' in line:
+                            match = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*Searched: (.+)', line)
+                            if match:
+                                activities.append({
+                                    'type': 'search',
+                                    'timestamp': match.group(1),
+                                    'detail': match.group(2).strip()
+                                })
+            except Exception as e:
+                logger.error(f'Error reading log file: {e}')
+        
+        return jsonify({
+            'success': True,
+            'activities': activities[-20:]  # Return last 20 activities
+        }), 200
+        
+    except Exception as e:
+        logger.error(f'Error getting activity log: {str(e)}')
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/health', methods=['GET'])

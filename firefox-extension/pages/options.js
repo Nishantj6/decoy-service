@@ -51,6 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
             showMessage('Settings reset to defaults', 'success');
         }, 100);
     });
+
+    // Load activity log
+    loadActivityLog();
+    document.getElementById('refresh-log').addEventListener('click', loadActivityLog);
 });
 
 function updateIntervalValue() {
@@ -95,4 +99,39 @@ function showMessage(text, type = 'success') {
     setTimeout(() => {
         message.classList.add('hidden');
     }, 3000);
+}
+
+function loadActivityLog() {
+    const logDiv = document.getElementById('activity-log');
+    logDiv.innerHTML = '<p class="loading">Loading activity log...</p>';
+
+    fetch('http://localhost:9999/api/activity-log')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.activities.length > 0) {
+                logDiv.innerHTML = '';
+                data.activities.reverse().forEach(activity => {
+                    const item = document.createElement('div');
+                    item.className = 'activity-item';
+                    item.innerHTML = `
+                        <div class="timestamp">${activity.timestamp}</div>
+                        <span class="type ${activity.type}">${activity.type.toUpperCase()}</span>
+                        <div class="detail">${escapeHtml(activity.detail)}</div>
+                    `;
+                    logDiv.appendChild(item);
+                });
+            } else {
+                logDiv.innerHTML = '<p class="loading">No activity yet</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading activity log:', error);
+            logDiv.innerHTML = '<p class="loading">Error loading activity log</p>';
+        });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
