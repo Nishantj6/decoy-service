@@ -44,9 +44,11 @@ function fetchServiceStatus() {
                 searchesPerformed: 0
             };
             
-            // Set session start time if just started
-            if (serviceStatus.isRunning && !serviceStatus.sessionStartTime) {
-                serviceStatus.sessionStartTime = Date.now();
+            // Use actual session duration from API instead of local tracking
+            if (serviceStatus.isRunning && data.stats && data.stats.sessionDurationMinutes !== undefined) {
+                // Calculate start time from duration
+                const durationSeconds = (data.stats.sessionDurationMinutes || 0) * 60;
+                serviceStatus.sessionStartTime = Date.now() - (durationSeconds * 1000);
             } else if (!serviceStatus.isRunning) {
                 serviceStatus.sessionStartTime = null;
             }
