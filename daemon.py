@@ -220,25 +220,33 @@ class DecoyDaemon:
             return {'success': False, 'error': str(e)}
     
     def cmd_status(self) -> Dict[str, Any]:
-        """Get service status"""
+        """Get service status - format for Firefox extension compatibility"""
         try:
             if not self.service:
                 return {'success': False, 'error': 'Service not initialized'}
-            
-            status = {
-                'daemon_running': True,
-                'service_active': self.service_active,
-                'socket_path': str(SOCKET_PATH),
+
+            # Format expected by Firefox extension
+            response = {
+                'success': True,
+                'running': self.service_active,
+                'stats': {
+                    'sitesVisited': 0,
+                    'clicksMade': 0,
+                    'searchesPerformed': 0,
+                    'sessionDurationMinutes': 0
+                }
             }
-            
+
             # Try to get service stats
             try:
                 if hasattr(self.service, 'get_status'):
-                    status.update(self.service.get_status())
+                    service_status = self.service.get_status()
+                    if 'stats' in service_status:
+                        response['stats'].update(service_status['stats'])
             except:
                 pass
-            
-            return {'success': True, 'status': status}
+
+            return response
         except Exception as e:
             logger.error(f"Failed to get status: {e}")
             return {'success': False, 'error': str(e)}
