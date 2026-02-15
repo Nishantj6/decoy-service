@@ -1,0 +1,364 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    DECOY SERVICE - COMPLETE FILE LIST                      ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+📍 LOCATION: /Users/iot_lab/Documents/Automation/Decoy/Claude/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 DOCUMENTATION & GUIDES (8 files)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+START_HERE.txt              ASCII art summary with commands - READ THIS FIRST
+QUICKSTART.md               5-minute setup & common tasks guide
+README.md                   Comprehensive documentation (4,000+ words)
+REFERENCE.md                Command/configuration quick reference card
+STRUCTURE.md                File organization guide with ASCII tree
+BUILD_SUMMARY.md            Detailed build summary & features
+TROUBLESHOOTING.md          Common issues & solutions guide
+INDEX.md                    Complete file index (this overview)
+FILES.txt                   This file listing
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚙️  CORE SERVICE CODE (7 files)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+decoy_service/
+├── __init__.py                  Package initialization & imports
+├── decoy_service.py             Main service orchestrator (520 lines)
+├── browser_agent.py             Browser automation - Selenium & Playwright (390 lines)
+├── scheduler.py                 Background scheduling & daemon mode (180 lines)
+├── utils.py                     Logging, config, tracking utilities (340 lines)
+├── examples.py                  Usage examples & patterns (250 lines)
+└── requirements.txt             Python package dependencies
+
+Total Python Code: ~1,680 lines of well-documented code
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚙️  CONFIGURATION FILES (3 files)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+decoy_service/config/
+├── settings.yaml                Main behavior configuration
+│                                (browser, timing, clicking, logging)
+├── websites.yaml                Website categories & search queries
+│                                (news, tech, education, etc.)
+└── .env.example                 Environment variables template
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📁 DIRECTORIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+decoy_service/                  Main service package
+├── config/                     Configuration directory
+└── logs/                       Activity logs directory (auto-created)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📜 LICENSE & SETUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+LICENSE                         MIT License with disclaimer
+setup.sh                        Automated installation script
+                                (creates venv, installs deps, sets up config)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 FILE SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Total Files:        21
+Total Lines:        ~1,680 (Python code)
+Documentation:      8 comprehensive guides
+Config Files:       3 YAML files
+Directories:        3 (decoy_service, config, logs)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 WHAT TO READ FIRST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. START_HERE.txt               Visual overview with ASCII art
+2. QUICKSTART.md                Get running in 5 minutes
+3. REFERENCE.md                 Command & config reference
+4. README.md                    Full documentation (if you want details)
+5. TROUBLESHOOTING.md           If you have problems
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 QUICK START
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Install & Run:
+    cd Claude/decoy_service
+    pip install -r requirements.txt
+    python decoy_service.py
+
+Or with Playwright:
+    pip install -r requirements.txt
+    playwright install
+    python decoy_service.py
+
+Schedule Sessions:
+    python scheduler.py
+
+View Logs:
+    tail -f logs/decoy_service.log
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔑 KEY MODULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DecoyService (decoy_service.py)
+    ↳ Main orchestrator that coordinates all activity
+    ↳ Visits websites, performs clicks, conducts searches
+    ↳ Tracks activity and generates reports
+
+BrowserAgent (browser_agent.py)
+    ↳ SeleniumAgent - Uses Selenium WebDriver
+    ↳ PlaywrightAgent - Uses Playwright
+    ↳ Handles navigation, clicking, scrolling, forms
+
+DecoyScheduler (scheduler.py)
+    ↳ Runs sessions at scheduled intervals
+    ↳ Supports hourly, daily, custom schedules
+    ↳ Background daemon mode
+
+ConfigManager (utils.py)
+    ↳ Loads YAML configuration files
+    ↳ Manages settings and website lists
+
+ActivityTracker (utils.py)
+    ↳ Tracks statistics and metrics
+    ↳ Generates session summaries
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ FEATURES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ Confuses behavioral tracking
+✓ Pollutes advertising profiles
+✓ Creates signal noise to advertisers
+✓ Prevents filter bubbles
+✓ Protects privacy from profilers
+
+✓ Realistic human-like delays
+✓ Random click patterns
+✓ Page scrolling simulation
+✓ Search query execution
+✓ User-agent rotation
+
+✓ One-time or scheduled sessions
+✓ Configurable behavior
+✓ Detailed logging and monitoring
+✓ Headless and visible modes
+✓ Proxy support
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📖 FILE DESCRIPTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DOCUMENTATION:
+
+START_HERE.txt
+    Visual ASCII art summary. Best starting point with quick commands.
+    
+QUICKSTART.md
+    5-minute setup guide. Installation, first run, common tasks.
+    
+README.md
+    Comprehensive documentation covering everything:
+    - How it works
+    - Installation instructions
+    - Configuration guide
+    - Usage examples
+    - Troubleshooting
+    - Architecture details
+    - Safety & ethics guidelines
+    
+REFERENCE.md
+    Quick reference card with:
+    - All commands
+    - Configuration options
+    - Common tweaks
+    - Error solutions
+    
+STRUCTURE.md
+    Visual file organization with descriptions of each file.
+    
+BUILD_SUMMARY.md
+    Detailed summary of what was built including:
+    - Components overview
+    - Feature list
+    - Code statistics
+    - Customization examples
+    
+TROUBLESHOOTING.md
+    Comprehensive troubleshooting guide covering:
+    - Installation issues
+    - Browser problems
+    - Website access issues
+    - Performance issues
+    - Configuration problems
+    - Platform-specific issues (Mac, Linux, Windows)
+    - Debugging tips
+
+INDEX.md
+    Complete index of all files with descriptions and quick links.
+
+FILES.txt (this file)
+    Listing of all files in the project.
+
+
+CORE SERVICE CODE:
+
+decoy_service.py
+    Main DecoyService class that orchestrates everything:
+    - Loads configuration
+    - Creates browser agents
+    - Generates activity patterns
+    - Tracks statistics
+    - Manages sessions
+    ~520 lines, well-documented
+    
+browser_agent.py
+    Browser automation layer:
+    - BrowserAgent abstract class
+    - SeleniumAgent - Selenium WebDriver implementation
+    - PlaywrightAgent - Playwright implementation
+    - Website navigation, clicking, scrolling, form filling
+    ~390 lines, extensible design
+    
+scheduler.py
+    Background scheduling:
+    - DecoyScheduler class
+    - Schedule sessions hourly, daily, or at intervals
+    - Background daemon mode
+    - Multiple schedule support
+    ~180 lines
+    
+utils.py
+    Utility functions and classes:
+    - Logger - Centralized logging setup
+    - ConfigManager - Load YAML configs
+    - ActivityTracker - Statistics and metrics
+    - RandomnessGenerator - Realistic randomness
+    ~340 lines, modular design
+    
+examples.py
+    Usage examples and patterns:
+    - Simple one-time session
+    - Scheduled sessions
+    - Custom configuration
+    - Activity tracking
+    - Background/headless mode
+    ~250 lines, runnable examples
+    
+__init__.py
+    Package initialization with version info and imports.
+    
+requirements.txt
+    Python package dependencies:
+    - selenium (4.15+)
+    - playwright (1.40+)
+    - pyyaml (6.0+)
+    - requests
+    - beautifulsoup4
+    - schedule
+    - faker
+    - python-dotenv
+
+
+CONFIGURATION:
+
+settings.yaml
+    Main behavior configuration:
+    - Browser settings (type, headless, user-agents)
+    - Activity timing (delays, dwell times)
+    - Clicking behavior (clicks per page, scrolling)
+    - Request patterns (proxies)
+    - Logging configuration
+    - Service control (duration, parallel agents)
+    Fully customizable via YAML
+    
+websites.yaml
+    Content configuration:
+    - Website categories (news, tech, education, entertainment, lifestyle)
+    - URLs for each category
+    - Search queries
+    - Fully customizable
+    
+.env.example
+    Environment variables template:
+    - Copy to .env and customize
+    - Proxy settings
+    - Browser settings
+    - API endpoints
+    - Feature flags
+
+
+SETUP & LICENSE:
+
+setup.sh
+    Automated setup script that:
+    - Creates Python virtual environment
+    - Installs dependencies
+    - Sets up Playwright (optional)
+    - Creates config files
+    - Creates logs directory
+    Bash script, macOS/Linux compatible
+    
+LICENSE
+    MIT License with legal disclaimer and ethical guidelines.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 TYPICAL WORKFLOWS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WORKFLOW 1: Quick One-Time Run
+    Read:       START_HERE.txt or QUICKSTART.md
+    Install:    pip install -r requirements.txt
+    Run:        python decoy_service.py
+    Monitor:    tail -f logs/decoy_service.log
+
+WORKFLOW 2: Schedule Regular Sessions
+    Read:       QUICKSTART.md
+    Edit:       scheduler.py (add schedule)
+    Run:        python scheduler.py
+    Monitor:    tail -f logs/decoy_service.log
+
+WORKFLOW 3: Customize Configuration
+    Read:       REFERENCE.md or README.md
+    Edit:       config/websites.yaml
+    Edit:       config/settings.yaml
+    Run:        python decoy_service.py
+
+WORKFLOW 4: Troubleshoot Issues
+    Read:       TROUBLESHOOTING.md
+    Check:      logs/decoy_service.log
+    Enable:     Debug logging in settings.yaml
+    Run:        python decoy_service.py (with headless=false)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💻 DEPENDENCIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Python Packages (from requirements.txt):
+    - selenium >= 4.15.0         (browser automation)
+    - playwright >= 1.40.0       (browser automation alternative)
+    - requests >= 2.31.0         (HTTP requests)
+    - beautifulsoup4 >= 4.12.0   (HTML parsing)
+    - python-dotenv >= 1.0.0     (env variables)
+    - pyyaml >= 6.0              (YAML config)
+    - schedule >= 1.2.0          (scheduling)
+    - faker >= 20.0.0            (fake data)
+
+External Tools:
+    - Python 3.8+
+    - Chrome/Chromium or Firefox (for browser driver)
+    - ChromeDriver or Playwright browsers
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Project Status: COMPLETE & READY TO USE
+🚀 Ready to protect your privacy? Start with START_HERE.txt or QUICKSTART.md
+🔐 Questions? Check REFERENCE.md or README.md
+🐛 Problems? See TROUBLESHOOTING.md
+
+Version: 1.0.0 | License: MIT | Created: February 15, 2026

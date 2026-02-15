@@ -1,0 +1,67 @@
+# Decoy Service Configuration
+
+# Browser automation settings
+browser:
+  # Options: "chrome", "firefox", "safari", "playwright"
+  type: "chrome"
+  headless: true
+  # User agent rotation for better obfuscation
+  rotate_user_agents: true
+
+# Activity timing
+activity:
+  # Minimum and maximum time between actions (seconds)
+  click_interval_min: 2
+  click_interval_max: 8
+  
+  # Time to spend on each page (seconds)
+  page_dwell_min: 5
+  page_dwell_max: 30
+  
+  # Requests per hour (to avoid detection)
+  requests_per_hour: 20
+  
+  # Time between sessions (minutes)
+  session_interval_min: 30
+  session_interval_max: 120
+
+# Clicking behavior
+clicking:
+  # Number of random clicks per page
+  clicks_per_page_min: 1
+  clicks_per_page_max: 5
+  
+  # Enable scrolling
+  enable_scrolling: true
+  
+  # Enable form interactions (filling fields, etc)
+  enable_form_interaction: false
+
+# Request patterns
+requests:
+  # Add random headers
+  add_random_headers: true
+  
+  # Rotate proxies (set to empty list if not using proxies)
+  proxies: []
+  
+  # Add random delays between requests
+  randomize_timing: true
+
+# Logging
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  log_file: "logs/decoy_service.log"
+  max_log_size_mb: 100
+  backup_count: 5
+
+# Service control
+service:
+  # Whether to start automatically
+  auto_start: false
+  
+  # Session duration (minutes, 0 = infinite)
+  session_duration: 0
+  
+  # Number of parallel agents (careful with this!)
+  parallel_agents: 1

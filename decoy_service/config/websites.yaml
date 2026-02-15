@@ -1,0 +1,61 @@
+# Random websites to visit for decoy activity
+# The agent will randomly select from these categories
+
+categories:
+  news:
+    - "https://news.ycombinator.com"
+    - "https://reddit.com/r/worldnews"
+    - "https://bbc.com"
+    - "https://cnn.com"
+    - "https://guardian.com"
+    - "https://reuters.com"
+    - "https://techcrunch.com"
+    
+  tech:
+    - "https://github.com"
+    - "https://stackoverflow.com"
+    - "https://dev.to"
+    - "https://medium.com/tag/technology"
+    - "https://arstechnica.com"
+    - "https://slashdot.org"
+    
+  education:
+    - "https://wikipedia.org"
+    - "https://coursera.org"
+    - "https://edx.org"
+    - "https://khanacademy.org"
+    - "https://freecodecamp.org"
+    
+  entertainment:
+    - "https://imdb.com"
+    - "https://reddit.com/r/movies"
+    - "https://youtube.com"
+    - "https://spotify.com"
+    - "https://letterboxd.com"
+    
+  lifestyle:
+    - "https://medium.com"
+    - "https://quora.com"
+    - "https://twitter.com"
+    - "https://imgur.com"
+
+# Search queries to randomize
+search_queries:
+  - "machine learning trends"
+  - "climate change solutions"
+  - "renewable energy"
+  - "space exploration news"
+  - "quantum computing"
+  - "artificial intelligence ethics"
+  - "cybersecurity best practices"
+  - "data privacy laws"
+  - "digital transformation"
+  - "blockchain technology"
+  - "autonomous vehicles"
+  - "healthcare innovation"
+  - "astronomy discoveries"
+  - "philosophy essays"
+  - "cooking recipes"
+  - "gardening tips"
+  - "fitness routines"
+  - "travel destinations"
