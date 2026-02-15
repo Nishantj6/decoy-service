@@ -8,6 +8,7 @@ TEMPLATE_PLIST="${PROJECT_DIR}/com.decoy-service.daemon.plist"
 LAUNCH_AGENTS_DIR="${HOME}/Library/LaunchAgents"
 TARGET_PLIST="${LAUNCH_AGENTS_DIR}/${LABEL}.plist"
 RUNTIME_DIR="${HOME}/.decoy-service"
+APP_DIR="${RUNTIME_DIR}/app"
 STDOUT_LOG="${RUNTIME_DIR}/daemon-stdout.log"
 STDERR_LOG="${RUNTIME_DIR}/daemon-stderr.log"
 LAUNCH_DOMAIN="gui/$(id -u)"
@@ -56,17 +57,25 @@ resolve_python_bin() {
 
 render_plist() {
   local python_bin="$1"
-  local escaped_project_dir escaped_python_bin escaped_home
+  local service_dir="$2"
+  local escaped_service_dir escaped_python_bin escaped_home
 
-  escaped_project_dir="${PROJECT_DIR//\//\\/}"
+  escaped_service_dir="${service_dir//\//\\/}"
   escaped_python_bin="${python_bin//\//\\/}"
   escaped_home="${HOME//\//\\/}"
 
   sed \
-    -e "s/{{DECOY_SERVICE_PATH}}/${escaped_project_dir}/g" \
+    -e "s/{{DECOY_SERVICE_PATH}}/${escaped_service_dir}/g" \
     -e "s/{{PYTHON_BIN}}/${escaped_python_bin}/g" \
     -e "s/{{USER_HOME}}/${escaped_home}/g" \
     "${TEMPLATE_PLIST}" > "${TARGET_PLIST}"
+}
+
+stage_runtime_files() {
+  rm -rf "${APP_DIR}"
+  mkdir -p "${APP_DIR}"
+  cp "${PROJECT_DIR}/api_server.py" "${APP_DIR}/api_server.py"
+  cp -R "${PROJECT_DIR}/decoy_service" "${APP_DIR}/decoy_service"
 }
 
 bootout_if_loaded() {
@@ -88,13 +97,15 @@ install_daemon() {
   fi
 
   mkdir -p "${LAUNCH_AGENTS_DIR}" "${RUNTIME_DIR}"
-  render_plist "${python_bin}"
+  stage_runtime_files
+  render_plist "${python_bin}" "${APP_DIR}"
 
   bootout_if_loaded || true
   launchctl bootstrap "${LAUNCH_DOMAIN}" "${TARGET_PLIST}"
   launchctl kickstart -k "${LAUNCH_DOMAIN}/${LABEL}"
 
   echo "Installed and started ${LABEL}"
+  echo "Daemon code staged at ${APP_DIR}"
   echo "API should be available at http://localhost:${PORT}/api/health"
 }
 
