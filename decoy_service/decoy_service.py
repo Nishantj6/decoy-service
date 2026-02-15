@@ -9,8 +9,8 @@ import random
 from typing import Dict, Any, List
 from datetime import datetime, timedelta
 
-from utils import Logger, ConfigManager, ActivityTracker, RandomnessGenerator
-from browser_agent import create_agent
+from .utils import Logger, ConfigManager, ActivityTracker, RandomnessGenerator
+from .browser_agent import create_agent
 
 
 class DecoyService:

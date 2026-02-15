@@ -4,7 +4,7 @@ Example usage and advanced scenarios for Decoy Service
 
 from decoy_service import DecoyService
 from scheduler import DecoyScheduler
-from utils import Logger, ConfigManager
+from .utils import Logger, ConfigManager
 import logging
 
 

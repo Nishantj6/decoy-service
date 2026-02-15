@@ -8,7 +8,7 @@ import schedule
 import time
 import threading
 from typing import Dict, Any
-from decoy_service import DecoyService
+from .decoy_service import DecoyService
 
 
 class DecoyScheduler:
@@ -83,7 +83,7 @@ class DecoyScheduler:
 def main():
     """Example usage of scheduler"""
     import sys
-    from utils import Logger, ConfigManager
+    from .utils import Logger, ConfigManager
     
     config_dir = 'config'
     if len(sys.argv) > 1:

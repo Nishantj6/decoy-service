@@ -18,7 +18,7 @@ __license__ = "MIT"
 try:
     from decoy_service import DecoyService
     from scheduler import DecoyScheduler
-    from utils import Logger, ConfigManager, ActivityTracker, RandomnessGenerator
+    from .utils import Logger, ConfigManager, ActivityTracker, RandomnessGenerator
     from browser_agent import BrowserAgent, SeleniumAgent, PlaywrightAgent
 except ImportError:
     # Module may be run directly without imports

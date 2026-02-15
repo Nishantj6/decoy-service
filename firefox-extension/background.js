@@ -37,7 +37,7 @@ function startDecoyService() {
     // For now, we'll use a simple HTTP request approach
     // This would require the Python service to expose a REST API
     
-    fetch('http://localhost:5000/api/start', {
+    fetch('http://localhost:9999/api/start', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -55,7 +55,7 @@ function startDecoyService() {
 function stopDecoyService() {
     console.log('🔴 Decoy Service stopped');
     
-    fetch('http://localhost:5000/api/stop', {
+    fetch('http://localhost:9999/api/stop', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

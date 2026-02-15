@@ -175,7 +175,7 @@ class SeleniumAgent(BrowserAgent):
     
     def _get_user_agent(self) -> str:
         """Get user agent from config or use default"""
-        from utils import RandomnessGenerator
+        from .utils import RandomnessGenerator
         if self.config.get('browser', {}).get('rotate_user_agents'):
             return RandomnessGenerator.get_random_user_agent()
         return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"

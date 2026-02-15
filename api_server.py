@@ -11,9 +11,12 @@ import logging
 import sys
 import os
 
-# Import service components
-from .decoy_service import DecoyService
-from .scheduler import DecoyScheduler
+# Add decoy_service module to path
+sys.path.insert(0, os.path.dirname(__file__))
+
+from decoy_service.decoy_service import DecoyService
+from decoy_service.scheduler import DecoyScheduler
+from decoy_service.utils import Logger, ConfigManager
 
 app = Flask(__name__)
 CORS(app)
@@ -28,7 +31,7 @@ service_thread = None
 scheduler = None
 
 # Port for the API
-API_PORT = 5000
+API_PORT = 9999
 
 @app.route('/api/start', methods=['POST'])
 def start_service():
@@ -136,7 +139,6 @@ def manage_config():
             if service:
                 config = service.settings
             else:
-                from utils import ConfigManager
                 cm = ConfigManager('decoy_service/config')
                 config = cm.load_settings()
             
@@ -178,8 +180,6 @@ def schedule_service():
         
         interval = int(data.get('interval', 180))  # minutes
         duration = int(data.get('duration', 15))   # minutes
-        
-        from utils import Logger, ConfigManager
         
         config_manager = ConfigManager('decoy_service/config')
         settings = config_manager.load_settings()
