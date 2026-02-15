@@ -129,6 +129,29 @@ Install the Firefox extension from the `firefox-extension/` directory to control
 python3 api_server.py
 ```
 
+**Distributing to friends:**
+
+To share this extension with friends for permanent installation:
+
+1. Build the extension package:
+   ```bash
+   cd firefox-extension
+   ./build-xpi.sh
+   ```
+
+2. Sign with Mozilla (required for permanent installation):
+   - Go to https://addons.mozilla.org/developers/
+   - Upload `dist/decoy-service-1.0.0.xpi`
+   - Choose "Self-distributed" (unlisted) for private sharing
+   - Download the signed `.xpi` file
+
+3. Share the signed `.xpi` file:
+   - Upload to GitHub Releases
+   - Share via cloud storage or direct download
+   - Friends can double-click to install permanently
+
+See [firefox-extension/DISTRIBUTION.md](firefox-extension/DISTRIBUTION.md) for detailed distribution guide.
+
 See [DAEMON_APPROACH.md](DAEMON_APPROACH.md) for detailed architecture documentation.
 
 ---
