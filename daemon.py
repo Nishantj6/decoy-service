@@ -262,7 +262,8 @@ class DecoyDaemon:
                 lines = f.readlines()
 
             activities = []
-            for line in lines[-20:]:  # Last 20 activities
+            # Read last 100 lines to ensure we get at least 10 activities after filtering
+            for line in lines[-100:]:
                 # Parse log format: "2024-01-01 12:00:00 - ... - INFO - Visited: https://example.com"
                 if 'Visited:' in line or 'Searched:' in line:
                     try:
@@ -291,7 +292,8 @@ class DecoyDaemon:
                         logger.debug(f"Failed to parse log line: {parse_error}")
                         continue
 
-            return {'success': True, 'activities': activities}
+            # Return only the 10 most recent activities
+            return {'success': True, 'activities': activities[-10:]}
         except Exception as e:
             logger.error(f"Failed to read activity log: {e}")
             return {'success': False, 'error': str(e)}
