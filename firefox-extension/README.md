@@ -10,17 +10,23 @@ pip install flask flask-cors
 
 ### 2. Start the API Server
 ```bash
-python3 decoy_service/api_server.py
+python3 api_server.py
 ```
 
 Keep this running! You'll see:
 ```
-Starting Decoy Service API on http://localhost:5000
+Starting Decoy Service API on http://localhost:9999
 API endpoints:
   POST   /api/start       - Start the service
   POST   /api/stop        - Stop the service
   GET    /api/status      - Get service status
   ...
+```
+
+Optional (macOS daemon mode):
+```bash
+./daemonctl.sh install
+./daemonctl.sh status
 ```
 
 ### 3. Load Extension in Firefox
@@ -111,7 +117,7 @@ The popup shows:
 **Problem**: Extension shows "cannot connect" error
 **Solution**: 
 - Verify API server is running (see Step 2 above)
-- Check server is on `localhost:5000`
+- Check server is on `localhost:9999`
 - No firewall blocking localhost
 
 ### Icons don't show
@@ -148,7 +154,7 @@ User Interface
         │
         └─→ HTTP Request
             │
-            └─→ localhost:5000 (Flask API)
+            └─→ localhost:9999 (Flask API)
                 │
                 └─→ DecoyService (Python)
                     ├── Browser Agent (Selenium/Playwright)
@@ -172,14 +178,14 @@ User Interface
 ## 🔐 Security Notes
 
 ✅ **Safe**:
-- All communication is local (localhost:5000)
+- All communication is local (localhost:9999)
 - No data sent to external servers
 - Settings stored in browser only
 - No telemetry or tracking
 
 ⚠️ **Important**:
 - Keep API server on localhost only
-- Don't expose port 5000 to internet
+- Don't expose port 9999 to internet
 - Use firewall to block external access
 - Only use for personal privacy protection
 

@@ -49,10 +49,16 @@ cd /Users/iot_lab/Documents/Automation/Decoy/Claude
 pip install flask flask-cors
 
 # Start the API server
-python3 decoy_service/api_server.py
+python3 api_server.py
 ```
 
-The server will run on `http://localhost:5000`
+The server will run on `http://localhost:9999`
+
+Optional (macOS daemon mode):
+```bash
+./daemonctl.sh install
+./daemonctl.sh status
+```
 
 ### Step 3: Use the Extension
 
@@ -97,7 +103,7 @@ Firefox Extension UI
         ↓
     background.js (Listens for messages)
         ↓
-    HTTP Request to localhost:5000
+    HTTP Request to localhost:9999
         ↓
     api_server.py (Python Flask server)
         ↓
@@ -167,31 +173,31 @@ The extension communicates with these endpoints:
 ### POST /api/start
 Start the decoy service
 ```bash
-curl -X POST http://localhost:5000/api/start
+curl -X POST http://localhost:9999/api/start
 ```
 
 ### POST /api/stop
 Stop the service
 ```bash
-curl -X POST http://localhost:5000/api/stop
+curl -X POST http://localhost:9999/api/stop
 ```
 
 ### GET /api/status
 Get current status and statistics
 ```bash
-curl http://localhost:5000/api/status
+curl http://localhost:9999/api/status
 ```
 
 ### GET /api/config
 Get current configuration
 ```bash
-curl http://localhost:5000/api/config
+curl http://localhost:9999/api/config
 ```
 
 ### POST /api/config
 Update configuration
 ```bash
-curl -X POST http://localhost:5000/api/config \
+curl -X POST http://localhost:9999/api/config \
   -H "Content-Type: application/json" \
   -d '{"intensity": "high"}'
 ```
@@ -199,7 +205,7 @@ curl -X POST http://localhost:5000/api/config \
 ### POST /api/schedule
 Schedule service at intervals
 ```bash
-curl -X POST http://localhost:5000/api/schedule \
+curl -X POST http://localhost:9999/api/schedule \
   -H "Content-Type: application/json" \
   -d '{"interval": 180, "duration": 15}'
 ```
@@ -207,19 +213,19 @@ curl -X POST http://localhost:5000/api/schedule \
 ### GET /api/health
 Health check
 ```bash
-curl http://localhost:5000/api/health
+curl http://localhost:9999/api/health
 ```
 
 ## Troubleshooting
 
 ### "Popup not responding"
-- Check if API server is running: `python3 decoy_service/api_server.py`
-- Verify localhost:5000 is accessible
+- Check if API server is running: `python3 api_server.py`
+- Verify localhost:9999 is accessible
 - Check browser console for errors (F12)
 
 ### "Cannot connect to server"
 - API server not running
-- Wrong port (should be 5000)
+- Wrong port (should be 9999)
 - Firewall blocking localhost
 
 ### Service doesn't start
@@ -242,7 +248,7 @@ Edit `popup.js` to change behavior
 
 ### Add New API Endpoints
 
-Edit `decoy_service/api_server.py` to add routes
+Edit `api_server.py` to add routes
 
 ### Create Icons
 
@@ -276,7 +282,7 @@ Possible improvements:
 
 ⚠️ **Important Notes:**
 - Keep API server running on localhost only
-- Don't expose port 5000 to the internet
+- Don't expose port 9999 to the internet
 - Only use for personal privacy protection
 - Respect website terms of service
 

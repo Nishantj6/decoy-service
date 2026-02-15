@@ -90,6 +90,20 @@ tail -f logs/decoy_service.log
 # In config/settings.yaml, set: level: "DEBUG"
 ```
 
+### Run API Server as a macOS Daemon (for Firefox Extension)
+```bash
+# From project root
+./daemonctl.sh install
+
+# Verify daemon + API health
+./daemonctl.sh status
+
+# View daemon logs
+./daemonctl.sh logs
+```
+
+The extension API is available at `http://localhost:9999`.
+
 ## What It Does
 
 1. **Opens a browser** in headless mode
