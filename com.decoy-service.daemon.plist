@@ -21,10 +21,10 @@
     <true/>
     
     <key>StandardOutPath</key>
-    <string>{{DECOY_SERVICE_PATH}}/.decoy-service/daemon-stdout.log</string>
-    
+    <string>{{HOME}}/.decoy-service/daemon-stdout.log</string>
+
     <key>StandardErrorPath</key>
-    <string>{{DECOY_SERVICE_PATH}}/.decoy-service/daemon-stderr.log</string>
+    <string>{{HOME}}/.decoy-service/daemon-stderr.log</string>
     
     <key>EnvironmentVariables</key>
     <dict>

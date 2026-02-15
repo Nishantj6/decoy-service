@@ -58,7 +58,82 @@ Edit `config/websites.yaml` to customize:
 
 ## Usage
 
-### One-time Session
+### Daemon Mode (Recommended - Auto-Start)
+
+The daemon approach runs the service as a background process that auto-starts on system boot. This is ideal for continuous, hands-free operation.
+
+**Setup:**
+
+1. Install dependencies:
+```bash
+pip install -r decoy_service/requirements.txt
+playwright install
+```
+
+2. Install and configure the daemon:
+```bash
+chmod +x setup-daemon.sh
+./setup-daemon.sh
+```
+
+This will:
+- Create the runtime directory at `~/.decoy-service/`
+- Install a LaunchAgent (macOS) or systemd service (Linux)
+- Configure auto-start on user login
+- Start the daemon immediately
+
+**Control the daemon:**
+
+```bash
+# Using the control script (macOS)
+./daemonctl.sh install   # Install and start daemon
+./daemonctl.sh start     # Start daemon
+./daemonctl.sh stop      # Stop daemon
+./daemonctl.sh restart   # Restart daemon
+./daemonctl.sh status    # Check daemon status
+./daemonctl.sh logs      # View daemon logs
+./daemonctl.sh uninstall # Remove daemon
+
+# On Linux with systemd
+systemctl --user start decoy-daemon.service
+systemctl --user stop decoy-daemon.service
+systemctl --user status decoy-daemon.service
+```
+
+**Using the Python client:**
+
+```python
+from decoy_service.daemon_client import DaemonClient
+
+client = DaemonClient()
+
+# Start the service
+result = client.start()
+print(result)
+
+# Check status
+status = client.status()
+print(status)
+
+# Stop the service
+result = client.stop()
+print(result)
+```
+
+**Using the Firefox extension:**
+
+Install the Firefox extension from the `firefox-extension/` directory to control the daemon via a browser popup UI.
+
+**Note**: The daemon communicates via Unix domain socket at `~/.decoy-service/daemon.sock`. For Firefox extension compatibility, you'll also need to run `api_server.py` as a fallback HTTP bridge:
+```bash
+python3 api_server.py
+```
+
+See [DAEMON_APPROACH.md](DAEMON_APPROACH.md) for detailed architecture documentation.
+
+---
+
+### One-time Session (Manual Mode)
 
 Run a single decoy session:
 ```bash
@@ -70,7 +145,7 @@ Or with custom config directory:
 python decoy_service.py /path/to/config
 ```
 
-### Scheduled Sessions
+### Scheduled Sessions (Legacy)
 
 Run decoy activity at regular intervals:
 ```bash

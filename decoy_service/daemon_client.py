@@ -18,8 +18,9 @@ class DaemonClient:
         """Connect to daemon socket"""
         if not SOCKET_PATH.exists():
             raise ConnectionError(f"Daemon socket not found at {SOCKET_PATH}. Is daemon running?")
-        
+
         self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.socket.settimeout(5.0)  # 5 second timeout to prevent hangs
         self.socket.connect(str(SOCKET_PATH))
     
     def disconnect(self):

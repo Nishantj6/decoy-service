@@ -274,11 +274,11 @@ class DecoyDaemon:
 
 
 def main():
-    # Set working directory to decoy_service directory for proper relative imports
+    # Add project directory to path for proper imports without changing working directory
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    service_dir = os.path.join(script_dir, 'decoy_service')
-    os.chdir(service_dir)
-    
+    if script_dir not in sys.path:
+        sys.path.insert(0, script_dir)
+
     daemon = DecoyDaemon()
     daemon.start()
 

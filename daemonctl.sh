@@ -68,13 +68,14 @@ render_plist() {
   sed \
     -e "s/{{DECOY_SERVICE_PATH}}/${escaped_service_dir}/g" \
     -e "s/{{PYTHON_BIN}}/${escaped_python_bin}/g" \
-    -e "s/{{USER_HOME}}/${escaped_home}/g" \
+    -e "s/{{HOME}}/${escaped_home}/g" \
     "${TEMPLATE_PLIST}" > "${TARGET_PLIST}"
 }
 
 stage_runtime_files() {
   rm -rf "${APP_DIR}"
   mkdir -p "${APP_DIR}"
+  cp "${PROJECT_DIR}/daemon.py" "${APP_DIR}/daemon.py"
   cp "${PROJECT_DIR}/api_server.py" "${APP_DIR}/api_server.py"
   cp -R "${PROJECT_DIR}/decoy_service" "${APP_DIR}/decoy_service"
 }
@@ -98,16 +99,19 @@ install_daemon() {
   fi
 
   mkdir -p "${LAUNCH_AGENTS_DIR}" "${RUNTIME_DIR}"
+  # Note: For daemon approach, code runs from PROJECT_DIR directly, not staged
+  # Keeping staging for backward compatibility with HTTP server approach
   stage_runtime_files
-  render_plist "${python_bin}" "${APP_DIR}"
+  render_plist "${python_bin}" "${PROJECT_DIR}"
 
   bootout_if_loaded || true
   launchctl bootstrap "${LAUNCH_DOMAIN}" "${TARGET_PLIST}"
   launchctl kickstart -k "${LAUNCH_DOMAIN}/${LABEL}"
 
   echo "Installed and started ${LABEL}"
-  echo "Daemon code staged at ${APP_DIR}"
-  echo "API should be available at http://localhost:${PORT}/api/health"
+  echo "Daemon running from ${PROJECT_DIR}"
+  echo "Unix socket available at ~/.decoy-service/daemon.sock"
+  echo "API fallback available at http://localhost:${PORT}/api/health"
 }
 
 start_daemon() {
