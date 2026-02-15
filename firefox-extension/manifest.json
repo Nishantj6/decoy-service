@@ -28,7 +28,7 @@
   },
   
   "background": {
-    "service_worker": "background.js"
+    "scripts": ["background.js"]
   },
   
   "options_page": "pages/options.html",
