@@ -199,14 +199,33 @@ class DecoyService:
     def stop_session(self):
         """Stop the decoy session"""
         self.running = False
-        
+
         if self.agent:
             self.agent.close_browser()
-        
+
         self.tracker.print_summary()
         self.logger.info("="*60)
         self.logger.info("DECOY SERVICE SESSION ENDED")
         self.logger.info("="*60)
+
+    def get_status(self) -> Dict[str, Any]:
+        """Get current service status and stats for API/extension"""
+        from datetime import datetime
+
+        # Calculate session duration
+        if self.tracker.stats.get('session_start'):
+            session_duration = (datetime.now() - self.tracker.stats['session_start']).total_seconds() / 60
+        else:
+            session_duration = 0
+
+        return {
+            'stats': {
+                'sitesVisited': self.tracker.stats.get('websites_visited', 0),
+                'clicksMade': self.tracker.stats.get('clicks_made', 0),
+                'searchesPerformed': self.tracker.stats.get('search_queries', 0),
+                'sessionDurationMinutes': round(session_duration, 1)
+            }
+        }
 
 
 def main():
