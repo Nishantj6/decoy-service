@@ -8,7 +8,7 @@
     "gecko": {
       "id": "decoy-service@nishantj6.github.io",
       "data_collection_permissions": {
-        "required": false
+        "required": []
       }
     }
   },
