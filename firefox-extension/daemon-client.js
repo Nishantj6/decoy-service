@@ -58,7 +58,9 @@ class DaemonClient {
                     return;
             }
 
-            fetch(endpoint)
+            const method = (command === 'start' || command === 'stop') ? 'POST' : 'GET';
+
+            fetch(endpoint, { method })
                 .then(response => response.json())
                 .then(data => {
                     clearTimeout(timeout);
