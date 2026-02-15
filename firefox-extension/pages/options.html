@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decoy Service - Settings</title>
+    <link rel="stylesheet" href="options.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ Decoy Service Settings</h1>
+        </div>
+
+        <form id="settings-form">
+            <!-- Activity Settings -->
+            <section class="settings-section">
+                <h2>Activity Settings</h2>
+                
+                <div class="setting-group">
+                    <label for="intensity">Activity Intensity</label>
+                    <select id="intensity">
+                        <option value="low">Low (1-2 clicks per page)</option>
+                        <option value="medium" selected>Medium (3-5 clicks per page)</option>
+                        <option value="high">High (6-10 clicks per page)</option>
+                    </select>
+                </div>
+
+                <div class="setting-group">
+                    <label for="interval">Click Interval (seconds)</label>
+                    <div class="slider-container">
+                        <input type="range" id="interval" min="1" max="20" value="5" class="slider">
+                        <span id="interval-value">5s</span>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <label for="session-duration">Session Duration (minutes)</label>
+                    <div class="slider-container">
+                        <input type="range" id="session-duration" min="5" max="120" value="30" class="slider">
+                        <span id="duration-value">30m</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Browser Settings -->
+            <section class="settings-section">
+                <h2>Browser Settings</h2>
+                
+                <div class="setting-group checkbox">
+                    <input type="checkbox" id="headless" checked>
+                    <label for="headless">Run in headless mode (hidden)</label>
+                </div>
+
+                <div class="setting-group checkbox">
+                    <input type="checkbox" id="rotate-agents" checked>
+                    <label for="rotate-agents">Rotate user agents</label>
+                </div>
+
+                <div class="setting-group checkbox">
+                    <input type="checkbox" id="enable-scrolling" checked>
+                    <label for="enable-scrolling">Enable page scrolling</label>
+                </div>
+            </section>
+
+            <!-- Content Settings -->
+            <section class="settings-section">
+                <h2>Content Preferences</h2>
+                
+                <div class="setting-group">
+                    <label for="categories">Website Categories</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox">
+                            <input type="checkbox" id="cat-news" value="news" checked>
+                            <label for="cat-news">News</label>
+                        </div>
+                        <div class="checkbox">
+                            <input type="checkbox" id="cat-tech" value="tech" checked>
+                            <label for="cat-tech">Technology</label>
+                        </div>
+                        <div class="checkbox">
+                            <input type="checkbox" id="cat-education" value="education" checked>
+                            <label for="cat-education">Education</label>
+                        </div>
+                        <div class="checkbox">
+                            <input type="checkbox" id="cat-entertainment" value="entertainment" checked>
+                            <label for="cat-entertainment">Entertainment</label>
+                        </div>
+                        <div class="checkbox">
+                            <input type="checkbox" id="cat-lifestyle" value="lifestyle" checked>
+                            <label for="cat-lifestyle">Lifestyle</label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Advanced Settings -->
+            <section class="settings-section">
+                <h2>Advanced</h2>
+                
+                <div class="setting-group checkbox">
+                    <input type="checkbox" id="auto-start">
+                    <label for="auto-start">Auto-start on browser launch</label>
+                </div>
+
+                <div class="setting-group">
+                    <label for="log-level">Logging Level</label>
+                    <select id="log-level">
+                        <option value="error">Error only</option>
+                        <option value="warning">Warnings</option>
+                        <option value="info" selected>Info</option>
+                        <option value="debug">Debug (verbose)</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Buttons -->
+            <div class="button-group">
+                <button type="submit" class="btn btn-save">💾 Save Settings</button>
+                <button type="reset" class="btn btn-reset">↺ Reset to Defaults</button>
+            </div>
+        </form>
+
+        <div id="message" class="message hidden"></div>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decoy Service</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔒 Decoy Service</h1>
+            <p class="subtitle">Privacy Protection</p>
+        </div>
+
+        <!-- Status Indicator -->
+        <div id="status-container" class="status-container">
+            <div class="status-indicator" id="status-indicator"></div>
+            <span id="status-text">Checking status...</span>
+        </div>
+
+        <!-- Main Controls -->
+        <div class="controls">
+            <button id="toggle-btn" class="btn btn-primary" disabled>
+                <span class="btn-icon">▶</span>
+                <span id="toggle-text">Start Service</span>
+            </button>
+            <button id="stop-btn" class="btn btn-danger" disabled>
+                <span class="btn-icon">⏹</span>
+                Stop Service
+            </button>
+        </div>
+
+        <!-- Activity Stats -->
+        <div id="stats-container" class="stats-container">
+            <h3>Activity Summary</h3>
+            <div class="stat-row">
+                <span class="stat-label">Status:</span>
+                <span id="stat-status" class="stat-value">Inactive</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Session Time:</span>
+                <span id="stat-time" class="stat-value">0:00</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Sites Visited:</span>
+                <span id="stat-visits" class="stat-value">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Clicks Made:</span>
+                <span id="stat-clicks" class="stat-value">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Searches:</span>
+                <span id="stat-searches" class="stat-value">0</span>
+            </div>
+        </div>
+
+        <!-- Settings & Links -->
+        <div class="footer">
+            <a href="pages/options.html" class="link-btn">⚙️ Settings</a>
+            <a href="https://github.com/Nishantj6/decoy-service" target="_blank" class="link-btn">📖 Documentation</a>
+        </div>
+
+        <!-- Notifications -->
+        <div id="notification" class="notification hidden"></div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
