@@ -7,7 +7,7 @@
     
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/bin/python3</string>
+        <string>{{DECOY_SERVICE_PATH}}/.venv/bin/python3</string>
         <string>{{DECOY_SERVICE_PATH}}/daemon.py</string>
     </array>
     

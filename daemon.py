@@ -225,28 +225,29 @@ class DecoyDaemon:
             if not self.service:
                 return {'success': False, 'error': 'Service not initialized'}
 
-            # Format expected by Firefox extension
-            response = {
-                'success': True,
-                'running': self.service_active,
-                'stats': {
-                    'sitesVisited': 0,
-                    'clicksMade': 0,
-                    'searchesPerformed': 0,
-                    'sessionDurationMinutes': 0
-                }
+            stats = {
+                'sitesVisited': 0,
+                'clicksMade': 0,
+                'searchesPerformed': 0,
+                'sessionDurationMinutes': 0
             }
 
-            # Try to get service stats
+            # Read real stats from the ActivityTracker
             try:
-                if hasattr(self.service, 'get_status'):
-                    service_status = self.service.get_status()
-                    if 'stats' in service_status:
-                        response['stats'].update(service_status['stats'])
-            except:
-                pass
+                if hasattr(self.service, 'tracker') and self.service.tracker:
+                    summary = self.service.tracker.get_summary()
+                    stats['sitesVisited'] = summary.get('websites_visited', 0)
+                    stats['clicksMade'] = summary.get('total_clicks', 0)
+                    stats['searchesPerformed'] = summary.get('search_queries', 0)
+                    stats['sessionDurationMinutes'] = summary.get('session_duration_minutes', 0)
+            except Exception as e:
+                logger.debug(f"Could not read tracker stats: {e}")
 
-            return response
+            return {
+                'success': True,
+                'running': self.service_active,
+                'stats': stats
+            }
         except Exception as e:
             logger.error(f"Failed to get status: {e}")
             return {'success': False, 'error': str(e)}

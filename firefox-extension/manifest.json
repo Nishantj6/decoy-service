@@ -18,7 +18,8 @@
     "storage",
     "activeTab",
     "webRequest",
-    "tabs"
+    "tabs",
+    "nativeMessaging"
   ],
   "icons": {
     "16": "icons/icon-16.svg",
@@ -37,8 +38,7 @@
   },
 
   "background": {
-    "scripts": ["background.js"],
-    "type": "module"
+    "scripts": ["background.js"]
   },
   
   "options_page": "pages/options.html",

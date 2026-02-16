@@ -1,79 +1,84 @@
-// Background service worker
-let decoyServiceProcess = null;
+// Background script - handles daemon communication
+var API_BASE = "http://localhost:9999/api";
 
-// Handle messages from popup
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'startService') {
-        startDecoyService();
-    } else if (request.action === 'stopService') {
-        stopDecoyService();
-    } else if (request.action === 'getStatus') {
-        getServiceStatus().then(status => {
-            sendResponse({ running: status.running, stats: status.stats });
+/**
+ * HTTP request to daemon API with retry.
+ * The daemon auto-starts on boot via LaunchAgent, so it should always be up.
+ * Retries a few times to handle the case where daemon is still starting.
+ */
+function apiRequest(path, method, retries) {
+    method = method || "GET";
+    retries = retries || 0;
+    var url = API_BASE + path;
+
+    return fetch(url, { method: method })
+        .then(function(resp) { return resp.json(); })
+        .catch(function(err) {
+            if (retries > 0) {
+                return new Promise(function(resolve) {
+                    setTimeout(resolve, 1500);
+                }).then(function() {
+                    return apiRequest(path, method, retries - 1);
+                });
+            }
+            throw err;
         });
-        return true; // Keep message channel open
+}
+
+// ---- Message handler from popup ----
+
+browser.runtime.onMessage.addListener(function(request, _sender, sendResponse) {
+    if (request.action === "startService") {
+        // Retry a few times in case daemon is still booting
+        apiRequest("/start", "POST", 3)
+            .then(function(data) { sendResponse({ success: true, data: data }); })
+            .catch(function(err) { sendResponse({ success: false, error: "Daemon offline. Run setup-daemon.sh to fix." }); });
+        return true;
+    }
+
+    if (request.action === "stopService") {
+        apiRequest("/stop", "POST")
+            .then(function(data) { sendResponse({ success: true, data: data }); })
+            .catch(function(err) { sendResponse({ success: false, error: err.message }); });
+        return true;
+    }
+
+    if (request.action === "getStatus") {
+        apiRequest("/status", "GET")
+            .then(function(data) {
+                sendResponse({
+                    running: data.running || false,
+                    stats: data.stats || {},
+                    daemonOnline: true
+                });
+            })
+            .catch(function() {
+                sendResponse({
+                    running: false,
+                    stats: {},
+                    daemonOnline: false
+                });
+            });
+        return true;
     }
 });
 
-function startDecoyService() {
-    console.log('🟢 Calling API to start service...');
-    fetch('http://localhost:9999/api/start', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Service start response:', data);
-    })
-    .catch(error => {
-        console.error('Error starting service:', error);
-    });
-}
+// ---- Periodic status sync ----
 
-function stopDecoyService() {
-    console.log('🔴 Calling API to stop service...');
-    fetch('http://localhost:9999/api/stop', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Service stop response:', data);
-    })
-    .catch(error => {
-        console.error('Error stopping service:', error);
-    });
-}
-
-function getServiceStatus() {
-    return fetch('http://localhost:9999/api/status')
-    .then(response => response.json())
-    .then(data => {
-        return {
-            running: data.running || false,
-            stats: data.stats || {}
-        };
-    })
-    .catch(error => {
-        console.error('Error getting status:', error);
-        return { running: false, stats: {} };
-    });
-}
-
-// Periodically sync status with API and broadcast to all popups
-setInterval(() => {
-    getServiceStatus().then(status => {
-        // Send status to all popup instances
-        chrome.runtime.sendMessage({
-            action: 'statusUpdate',
-            running: status.running,
-            stats: status.stats
-        }).catch(() => {
-            // Popup not open, that's fine
+setInterval(function() {
+    apiRequest("/status", "GET")
+        .then(function(data) {
+            return { running: data.running || false, stats: data.stats || {}, daemonOnline: true };
+        })
+        .catch(function() {
+            return { running: false, stats: {}, daemonOnline: false };
+        })
+        .then(function(status) {
+            browser.runtime.sendMessage({
+                action: "statusUpdate",
+                running: status.running,
+                stats: status.stats,
+                daemonOnline: status.daemonOnline
+            }).catch(function() {});
         });
-    });
-}, 1000);
+}, 2000);
