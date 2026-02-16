@@ -139,7 +139,9 @@ rm -rf ~/.decoy-service
     ├── manifest.json           # Extension manifest
     ├── popup.html/js/css       # Extension popup UI
     ├── background.js           # Background daemon communication
-    └── daemon-client.js        # API client
+    ├── daemon-client.js        # API client
+    └── dist/signed/
+        └── decoy-service-1.1.0-signed.xpi  # Signed extension (install this)
 ```
 
 ## Legal Disclaimer
