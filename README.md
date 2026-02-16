@@ -27,15 +27,21 @@ This single command:
 - Installs an auto-start service (LaunchAgent on macOS, systemd on Linux)
 - Starts the daemon immediately
 
-### 2. Load the Firefox extension
+### 2. Install the Firefox extension
 
-1. Open Firefox
-2. Go to `about:debugging#/runtime/this-firefox`
-3. Click **Load Temporary Add-on**
-4. Select `firefox-extension/manifest.json` from this repo
-5. Click the Decoy Service icon in the toolbar and press **Start**
+Open `firefox-extension/dist/signed/decoy-service-1.1.0-signed.xpi` in Firefox:
 
-That's it. The daemon runs automatically on every boot. Just click Start in the extension whenever you want to run a decoy session.
+- **Double-click** the `.xpi` file, or
+- **Drag and drop** it into a Firefox window, or
+- In Firefox: `about:addons` → gear icon → **Install Add-on From File** → select the `.xpi`
+
+Click **Add** when Firefox prompts you. The extension is now permanently installed and survives Firefox restarts.
+
+### 3. Start
+
+Click the Decoy Service icon in the Firefox toolbar and press **Start**.
+
+That's it. The daemon runs automatically on every boot. The extension stays installed permanently.
 
 ## How It Works
 

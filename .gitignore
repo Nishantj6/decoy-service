@@ -7,6 +7,9 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+!firefox-extension/dist/
+firefox-extension/dist/*
+!firefox-extension/dist/signed/
 downloads/
 eggs/
 .eggs/

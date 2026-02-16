@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Decoy Service",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Privacy protection through behavioral obfuscation. Enable/disable decoy browsing activity to confuse advertisers.",
 
   "browser_specific_settings": {
